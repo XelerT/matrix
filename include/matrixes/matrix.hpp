@@ -1,15 +1,17 @@
+#pragma once
+
 #include <vector>
 #include <memory>
 #include <iterator>
 
 #include "row.hpp"
 
-namespace matrix
+namespace matrixes
 {
         template <typename T>
         class matrix_t 
         {
-                private:
+                protected:
                         size_t n_rows;
                         size_t n_cols;
 
@@ -58,7 +60,7 @@ namespace matrix
 
                         ~matrix_t () = default;
 
-                        row_t<T> operator[] (size_t n_row_) { return *rows[n_row_]; }
+                        row_t<T>& operator[] (size_t n_row_) { return *rows[n_row_]; }
 
                         size_t get_n_cols () const { return n_cols; }
                         size_t get_n_rows () const { return n_rows; }

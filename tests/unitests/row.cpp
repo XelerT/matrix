@@ -1,6 +1,6 @@
 #include "config.hpp"
 
-using namespace matrix;
+using namespace matrixes;
 
 TEST (row, init)
 {
@@ -41,7 +41,7 @@ TEST (row, copy_ass)
         cp_row = row;
 
         EXPECT_EQ(cp_row.get_length(), 4);
-        
+
         EXPECT_EQ(cp_row[0], 1);
         EXPECT_EQ(cp_row[1], 2);
         EXPECT_EQ(cp_row[2], 3);

@@ -4,3 +4,4 @@
 #include <gmock/gmock.h>
 
 #include "matrix.hpp"
+#include "sq_matrix.hpp"

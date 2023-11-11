@@ -1,6 +1,6 @@
 #include "config.hpp"
 
-using namespace matrix;
+using namespace matrixes;
 
 TEST (matrix, init)
 {

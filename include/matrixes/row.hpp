@@ -1,12 +1,14 @@
+#pragma once 
+
 #include <vector>
 
-namespace matrix
+namespace matrixes
 {
         template <typename T>
         class row_t 
         {
                 private:
-                        size_t length;
+                        size_t length {};
                         std::vector<T> data {};
 
                 public:
@@ -18,6 +20,22 @@ namespace matrix
                                 length = data.size();
                         };
                         #pragma GCC diagnostic warning "-Weffc++"
+
+                        row_t () = default;
+
+                        void insert (T &elem) 
+                        {
+                                data.push_back(elem);
+                                length++;
+                        }
+
+                        void insert (T &elem, size_t index)
+                        {
+                                if (index < length)
+                                        data.insert(elem, index);
+                                else
+                                        throw std::out_of_range();
+                        }
 
                         row_t& operator+=(const row_t &rhs_) {
                                 if (length != rhs_.length)
@@ -37,7 +55,7 @@ namespace matrix
                                 return *this;
                         }
 
-                        T operator[] (size_t index_) { return data[index_]; }
+                        T& operator[] (size_t index_) { return data[index_]; }
 
                         size_t get_length () const { return length; }
         };
