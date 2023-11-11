@@ -96,9 +96,7 @@ namespace matrixes
 
                                 this->rows[i].swap(this->rows[max_elem_index]);
 
-                                std::cout << "check1 permutation increment " << permutation[this->n_cols] << "\n";
                                 permutation[this->n_cols]++;
-                                std::cout << "check2 permutation increment " << permutation[this->n_cols] << "\n";
                         }
 
                         for (size_t j = i + 1; j < this->n_cols; j++) {
