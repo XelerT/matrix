@@ -74,8 +74,8 @@ def gen_sq_matrix (size):
         return matrix, determinant
 
 
-# arr, determinant = gen_sq_matrix(3)
-# print(determinant)
-# for x in arr:
-#         for y in x:
-#                 print(y)
+arr, determinant = gen_sq_matrix(5)
+print(determinant)
+for x in arr:
+        for y in x:
+                print(y, end=" ")

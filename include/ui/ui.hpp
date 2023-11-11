@@ -3,7 +3,5 @@
 #include <vector>
 #include <utility>
 
-std::vector<std::pair<char, std::pair<int, int>>>
+std::pair<size_t, std::vector<double>>
 get_user_data ();
-
-std::vector<int> parse_input_data (std::vector<std::pair<char, std::pair<int, int>>> &input);

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 #include "utils/utils.hpp"
 #include "matrix.hpp"
 

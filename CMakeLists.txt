@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(matrix_tree)
+project(matrix)
 
 #build flags
 include(cmake/build_flags.cmake)
@@ -20,16 +20,12 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
         set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose Release or Debug" FORCE)
 endif()
 
-# flags
-
-# set(CMAKE_CXX_FLAGS_DEBUG "-Wall")
-
 # collect srcs 
 
 add_subdirectory(src)
 message(STATUS "Collected srcs: ${SRC_LIST}")
 
-message("Building avl_tree in ${CMAKE_BUILD_TYPE}.")
+message("Building matrix in ${CMAKE_BUILD_TYPE}.")
         
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
