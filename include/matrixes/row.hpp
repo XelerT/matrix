@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "utils/std_vector.hpp"
+
 namespace matrixes
 {
         template <typename T>
@@ -58,7 +60,28 @@ namespace matrixes
                         T& operator[] (size_t index_) { return data[index_]; }
 
                         size_t get_length () const { return length; }
+                        void swap (size_t index1, size_t index2);
+
+                        void dump () const;
         };
+
+//===================================================~~~DECLARATIONS~~~====================================================================
+
+//---------------------------------------------------~~~~~~Public~~~~~~--------------------------------------------------------------------
+
+        template <typename T>
+        void row_t<T>::swap (size_t index1, size_t index2)
+        {
+                auto temp    = data[index1];
+                data[index1] = data[index2];
+                data[index2] = temp; 
+        }
+
+        template <typename T>
+        void row_t<T>::dump () const 
+        {
+                print(data);
+        }
 
         template <typename T>
         row_t<T> operator+(const row_t<T> &rhs_, const row_t<T> &lhs_) {

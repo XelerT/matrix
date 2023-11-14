@@ -9,7 +9,7 @@
 namespace matrixes
 {
         template <typename T>
-        class matrix_t 
+        class matrix_t
         {
                 protected:
                         size_t n_rows;
@@ -65,7 +65,19 @@ namespace matrixes
                         size_t get_n_cols () const { return n_cols; }
                         size_t get_n_rows () const { return n_rows; }
 
+                        void dump () const;
+
                         // void transpose () {};
                         // void negate () {};
         };
+
+        template <typename T>
+        void matrix_t<T>::dump () const
+        {
+                for (size_t i = 0; i < n_rows; i++) {
+                        std::cout << "[ ";
+                        rows[i]->dump();
+                        std::cout << " ]\n";
+                }
+        }
 }

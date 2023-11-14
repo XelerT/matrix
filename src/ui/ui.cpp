@@ -18,10 +18,10 @@ get_user_data ()
         double input;
 
         while (elems.size() != n_elems && std::cin >> input)
-               elems.push_back(input);
+                elems.push_back(input);
 
-                if (std::cin.fail() && !std::cin.eof())
-                        throw std::runtime_error("You need to enter digits.");
+        if (std::cin.fail() && !std::cin.eof())
+                throw std::runtime_error("You need to enter digits.");
 
         return {n_dimensions, elems};
 }

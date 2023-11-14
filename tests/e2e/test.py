@@ -6,6 +6,8 @@ import os
 from subprocess import Popen, PIPE, STDOUT
 from pathlib import Path
 
+from matrix_gen import gen_sq_matrix
+
 class TERMINAL_COLORS:
         PURPLE    = '\033[95m'
         OKBLUE    = '\033[94m'
@@ -49,7 +51,7 @@ def check_output_data(n_test, stdout_data, correct_output, exec_time):
                                 f"Test {n_test} NOT Passed. "         + \
                                 f"File {data_files_names[n_test]}\n"  + \
                                 f"Output={stdout_data}\n"             + \
-                                f"\nRight={correct_output}\n"           + \
+                                f"\nRight={correct_output}\n"         + \
                         TERMINAL_COLORS.DEFAULT
                         )
         except:
@@ -78,31 +80,16 @@ def parse_data_file (file_name):
 
 
 def gen_data(file_name):
-        low_range_boarder = random.randint(-GEN_DATA_MAX, GEN_DATA_MAX)
-        high_range_boarder = random.randint(low_range_boarder, GEN_DATA_MAX)
-        
-        data = []
-        already_in_data = {}
-        n_nodes = parse_data_file(file_name)
-        correct_output = 0
-        
-        for i in range(n_nodes):
-                new_node = random.randint(-GEN_DATA_MAX, GEN_DATA_MAX)
-                while (new_node in already_in_data.keys()):
-                        new_node = random.randint(-GEN_DATA_MAX, GEN_DATA_MAX)
-                
-                already_in_data.update({new_node : new_node})
+        n_dimensions = parse_data_file(file_name)
 
-                if (low_range_boarder <= new_node <= high_range_boarder):
-                        correct_output += 1
-                data.append("k")
-                data.append(str(new_node))
+        matrix, determinant = gen_sq_matrix(n_dimensions)
+        data = [n_dimensions]
 
-        data.append("q")
-        data.append(str(low_range_boarder))
-        data.append(str(high_range_boarder))
+        for x in matrix:
+                for y in x:
+                        data.append(str(y))                
 
-        return data, str(correct_output)
+        return data, str(determinant)
         
 
 def run_e2e_test(app2run, input_data):
@@ -150,7 +137,7 @@ def run_e2e_tests(app_name, app2_name=str()):
 
 if __name__ == "__main__":
         get_data_files_names()
-        run_e2e_tests("./avl_tree", "./set")
+        run_e2e_tests("./matrix")
 
 
 log_file.close()

@@ -13,6 +13,8 @@ namespace matrixes
                 private:
                         T determinant {};
                         bool det_is_calculated = false;
+
+                        std::pair<T, size_t> find_abs_max_elem_in_column (size_t index);
                 public:
                         template<typename It>
                         sq_matrix_t (size_t n_rows_, It start_, It end_):
@@ -69,39 +71,27 @@ namespace matrixes
         std::pair<row_t<size_t>, status_t> 
         sq_matrix_t<T>::decompose (const T &degeneration_threshold)
         {
-                T max_elem {};
-                size_t max_elem_index {};
+                // T max_elem {};
+                // size_t max_elem_index {};
                 row_t<size_t> permutation {};
 
                 for (size_t i = 0; i <= this->n_rows; i++)
                         permutation.insert(i);
                 
                 for (size_t i = 0; i < this->n_rows; i++) {
-                        max_elem = 0;
-                        max_elem_index = 0;
+                        auto max_elem_with_index = find_abs_max_elem_in_column(i);
 
-                        for (size_t k = i; k < this->n_rows; k++) {
-                                auto abs_elem = std::fabs((*this)[k][i]);
-                                if (abs_elem > max_elem) {
-                                        max_elem       = abs_elem;
-                                        max_elem_index = k;
-                                }
-                        }
-
-                        if (max_elem < degeneration_threshold)
+                        if (max_elem_with_index.first < degeneration_threshold)
                                 return {permutation, status_t::DEGENERATED};
                         
-                        if (max_elem_index != i) {
-                                auto temp = permutation[i];
-                                permutation[i] = permutation[max_elem_index];
-                                permutation[max_elem_index] = temp;
-
-                                this->rows[i].swap(this->rows[max_elem_index]);
+                        if (max_elem_with_index.second != i) {
+                                permutation.swap(i, max_elem_with_index.second);
+                                this->rows[i].swap(this->rows[max_elem_with_index.second]);
 
                                 permutation[this->n_cols]++;
                         }
 
-                        for (size_t j = i + 1; j < this->n_cols; j++) {
+                        for (size_t j = i + 1; j < this->n_rows; j++) {
                                 (*this)[j][i] /= (*this)[i][i];
 
                                 for (size_t k = i + 1; k < this->n_cols; k++)
@@ -134,4 +124,24 @@ namespace matrixes
                 
                 return {determinant, status_t::OK};
         }
+
+//---------------------------------------------------~~~~~~Private~~~~~~--------------------------------------------------------------------
+
+        template <typename T>
+        std::pair<T, size_t> 
+        sq_matrix_t<T>::find_abs_max_elem_in_column (size_t index)
+        {
+                T max_elem;
+                size_t max_elem_index;
+
+                for (size_t k = index; k < this->n_rows; k++) {
+                        auto abs_elem = std::fabs((*this)[k][index]);
+                        if (abs_elem > max_elem) {
+                                max_elem       = abs_elem;
+                                max_elem_index = k;
+                        }
+                }
+                return {max_elem, max_elem_index}; 
+        }
+
 }

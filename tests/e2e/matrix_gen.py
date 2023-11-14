@@ -1,11 +1,11 @@
 import random
 import numpy as np
 
-GEN_DATA_MAX = 0xF
+GEN_DATA_MAX = 0x2
 
 
 def create_diag_matrix(diagonal):
-        matrix = np.array([np.array([0 for i in range(len(diagonal))]) for i in range(len(diagonal))])
+        matrix = np.array([np.array([0 for i in range(len(diagonal))]) for i in range(len(diagonal))], dtype=np.float64)
         for raw, i in zip(matrix, range(len(diagonal))):
                 raw[i] = diagonal[i]
 
@@ -24,8 +24,8 @@ def swap_raws(diagonal_matrix, n_raw_swaps):
                 diagonal_matrix[n_raw2] = tmp
                 
         if (n_raw_swaps % 2 != 0):
-                return -1
-        return 1
+                return -1.0
+        return 1.0
 
 
 def add_raws(diagonal_matrix, n_add_raws):
@@ -39,13 +39,17 @@ def add_raws(diagonal_matrix, n_add_raws):
 
 
 def multiply_matrix_raws(diagonal_matrix, n_mult_raws):
-        determinant_mult_coeff = 1
+        determinant_mult_coeff = 1.0
         for i in range(n_mult_raws):
                 n_raw = random.randint(0, len(diagonal_matrix) - 1)
-                coeff = random.randint(1, 5)
-                determinant_mult_coeff *= coeff
+                coeff = float(random.randint(1, 5))
+                if (random.randint(0, 1)):
+                        determinant_mult_coeff *= coeff
+                        diagonal_matrix[n_raw] *= coeff
+                else:
+                        determinant_mult_coeff /= coeff
+                        diagonal_matrix[n_raw] /= coeff
 
-                diagonal_matrix[n_raw] *= coeff
 
         return determinant_mult_coeff 
 
@@ -63,9 +67,9 @@ def mix_matrix(diagonal_matrix, determinant):
 
 
 def gen_sq_matrix (size):
-        diagonal = [ random.randint(-GEN_DATA_MAX, GEN_DATA_MAX) for i in range(size) ]
+        diagonal = [ float(random.randint(-GEN_DATA_MAX, GEN_DATA_MAX)) for i in range(size) ]
 
-        determinant = 1
+        determinant = 1.0
         for i in range(size):
                 determinant *= diagonal[i]
 
@@ -73,9 +77,3 @@ def gen_sq_matrix (size):
 
         return matrix, determinant
 
-
-arr, determinant = gen_sq_matrix(5)
-print(determinant)
-for x in arr:
-        for y in x:
-                print(y, end=" ")
