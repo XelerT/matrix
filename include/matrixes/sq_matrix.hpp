@@ -71,8 +71,6 @@ namespace matrixes
         std::pair<row_t<size_t>, status_t> 
         sq_matrix_t<T>::decompose (const T &degeneration_threshold)
         {
-                // T max_elem {};
-                // size_t max_elem_index {};
                 row_t<size_t> permutation {};
 
                 for (size_t i = 0; i <= this->n_rows; i++)
@@ -131,8 +129,8 @@ namespace matrixes
         std::pair<T, size_t> 
         sq_matrix_t<T>::find_abs_max_elem_in_column (size_t index)
         {
-                T max_elem;
-                size_t max_elem_index;
+                T max_elem {};
+                size_t max_elem_index {};
 
                 for (size_t k = index; k < this->n_rows; k++) {
                         auto abs_elem = std::fabs((*this)[k][index]);
