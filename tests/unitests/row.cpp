@@ -8,7 +8,7 @@ TEST (row, init)
 
         row_t<int> row {data.begin(), data.end()};
 
-        EXPECT_EQ(row.get_length(), 4);
+        EXPECT_EQ(row.get_size(), 4);
 
         EXPECT_EQ(row[0], 1);
         EXPECT_EQ(row[1], 2);
@@ -23,7 +23,7 @@ TEST (row, copy_ctor)
         row_t<int> row {data.begin(), data.end()};
         row_t cp_row {row};
 
-        EXPECT_EQ(cp_row.get_length(), 4);
+        EXPECT_EQ(cp_row.get_size(), 4);
 
         EXPECT_EQ(cp_row[0], 1);
         EXPECT_EQ(cp_row[1], 2);
@@ -40,7 +40,7 @@ TEST (row, copy_ass)
         row_t<int> cp_row {data2.begin(), data2.end()};
         cp_row = row;
 
-        EXPECT_EQ(cp_row.get_length(), 4);
+        EXPECT_EQ(cp_row.get_size(), 4);
 
         EXPECT_EQ(cp_row[0], 1);
         EXPECT_EQ(cp_row[1], 2);

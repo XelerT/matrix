@@ -47,12 +47,12 @@ def check_output_data(n_test, stdout_data, correct_output, exec_time):
                         TERMINAL_COLORS.DEFAULT
                         )
                 else:
-                        print(TERMINAL_COLORS.ERROR                      + \
-                                f"Test {n_test} NOT Passed. "            + \
-                                f"File {data_files_names[n_test]}\n"     + \
-                                f"Execution time: {exec_time:.03f} sec"  + \
-                                f"Output={stdout_data}\n"                + \
-                                f"\nRight={correct_output}\n"            + \
+                        print(TERMINAL_COLORS.ERROR                       + \
+                                f"Test {n_test} NOT Passed. "             + \
+                                f"File {data_files_names[n_test]}\n"      + \
+                                f"Execution time: {exec_time:.03f} sec\n" + \
+                                f"Output={stdout_data}\n"                 + \
+                                f"\nRight={correct_output}\n"             + \
                         TERMINAL_COLORS.DEFAULT
                         )
         except:

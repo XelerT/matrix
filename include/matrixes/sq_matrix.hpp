@@ -15,46 +15,14 @@ namespace matrixes
                         bool det_is_calculated = false;
 
                         std::pair<T, size_t> find_abs_max_elem_in_column (size_t index);
+
+                        using matrix_t<T>::n_rows;
+                        using matrix_t<T>::n_cols;
                 public:
                         template<typename It>
                         sq_matrix_t (size_t n_rows_, It start_, It end_):
                                 matrix_t<T>{n_rows_, n_rows_, start_, end_}
                         {}
-
-                        sq_matrix_t (const sq_matrix_t &rhs_):
-                                matrix_t<T>{rhs_}
-                        {
-                                determinant = rhs_.determinant;
-                                det_is_calculated = rhs_.det_is_calculated;
-                        }
-
-                        sq_matrix_t (const sq_matrix_t &&rhs_):
-                                matrix_t<T>{rhs_}
-                        {
-                                determinant = rhs_.determinant;
-                                det_is_calculated = rhs_.det_is_calculated;
-                        }
-
-                        sq_matrix_t& operator=(const sq_matrix_t &rhs_)
-                        {
-                                return *this = sq_matrix_t(rhs_);
-                        }
-
-                        sq_matrix_t& operator=(sq_matrix_t &&rhs_)
-                        {
-                                if (this != &rhs_) {
-                                        this->n_rows = rhs_.n_rows;
-                                        this->n_cols = rhs_.n_cols;
-
-                                        this->rows.swap(rhs_.rows);
-                                        determinant = rhs_.determinant;
-                                        det_is_calculated = rhs_.det_is_calculated;
-                                }       
-
-                                return *this;
-                        }
-
-                        ~sq_matrix_t () = default;
 
                         std::pair<row_t<size_t>, status_t>
                         decompose (const T &degeneration_threshold);
@@ -71,7 +39,7 @@ namespace matrixes
         std::pair<row_t<size_t>, status_t> 
         sq_matrix_t<T>::decompose (const T &degeneration_threshold)
         {
-                row_t<size_t> permutation {};
+                row_t<size_t> permutation {this->n_rows + 1};
 
                 for (size_t i = 0; i <= this->n_rows; i++)
                         permutation.insert(i);
@@ -84,7 +52,7 @@ namespace matrixes
                         
                         if (max_elem_with_index.second != i) {
                                 permutation.swap(i, max_elem_with_index.second);
-                                this->rows[i].swap(this->rows[max_elem_with_index.second]);
+                                this->swap(i, max_elem_with_index.second);
 
                                 permutation[this->n_cols]++;
                         }
