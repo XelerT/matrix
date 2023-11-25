@@ -20,8 +20,18 @@ namespace matrixes
                                 rows(n_rows_ ? static_cast<row_t<T>**>(new row_t<T>* [n_rows_]) : nullptr),
                                 n_rows(n_rows_), n_cols(n_cols_)
                         {
-                                for (size_t i = 0; i < n_rows_; i++)
-                                        rows[i] = static_cast<row_t<T>*>(::operator new(sizeof(row_t<T>)));
+                                for (size_t i = 0; i < n_rows_; i++) {
+                                        try {
+                                                rows[i] = static_cast<row_t<T>*>(::operator new(sizeof(row_t<T>)));
+                                        } catch (std::bad_alloc &ba) {
+                                                while (i) {
+                                                        --i;
+                                                        ::operator delete(rows[i]);
+                                                }
+                                                delete [] rows;
+                                                throw std::bad_alloc();
+                                        }
+                                }
                         }
 
                         ~matrix_container_t ()
