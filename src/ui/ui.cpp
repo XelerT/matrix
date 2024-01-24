@@ -25,3 +25,21 @@ get_user_data ()
 
         return {n_dimensions, elems};
 }
+
+pair<size_t, vector<size_t>>
+get_user_chain_data ()
+{
+        size_t n_matrixes;
+        cin >> n_matrixes;
+
+        vector<size_t> sizes {};
+        size_t input;
+
+        while (sizes.size() != n_matrixes && std::cin >> input)
+                sizes.push_back(input);
+
+        if (std::cin.fail() && !std::cin.eof())
+                throw std::runtime_error("You need to enter digits.");
+
+        return {n_matrixes, sizes};
+}

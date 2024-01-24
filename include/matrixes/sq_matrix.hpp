@@ -19,7 +19,7 @@ namespace matrixes
                         using matrix_t<T>::n_rows;
                         using matrix_t<T>::n_cols;
                 public:
-                        template<typename It>
+                        template <typename It>
                         sq_matrix_t (size_t n_rows_, It start_, It end_):
                                 matrix_t<T>{n_rows_, n_rows_, start_, end_}
                         {}
@@ -27,8 +27,7 @@ namespace matrixes
                         std::pair<row_t<size_t>, status_t>
                         decompose (const T &degeneration_threshold);
 
-                        std::pair<T, status_t> det (); 
-                
+                        std::pair<T, status_t> det ();
         };
 
 //===================================================~~~DECLARATIONS~~~====================================================================

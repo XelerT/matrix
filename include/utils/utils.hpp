@@ -17,6 +17,7 @@ enum class status_t
 // }
 
 const double THRESHOLD = 1e-5;
+const size_t MAX_SIZE_T_VALUE = static_cast<size_t>(-1);
 
 template <typename T> void construct (T *data, const T &rhs) { new (data) T(rhs); }
 template <typename T> void construct (T *data, T &&rhs)

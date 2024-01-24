@@ -9,7 +9,7 @@
 namespace matrixes
 {
         template <typename T>
-        class matrix_container_t 
+        class matrix_container_t
         {
                 protected:
                         row_t<T>** rows;
@@ -29,6 +29,8 @@ namespace matrixes
                                                         ::operator delete(rows[i]);
                                                 }
                                                 delete [] rows;
+                                                n_rows = 0;
+                                                n_cols = 0;
                                                 throw std::bad_alloc();
                                         }
                                 }
@@ -40,7 +42,8 @@ namespace matrixes
                                         destroy(rows[i]);
                                         ::operator delete(rows[i]);
                                 }
-                                delete [] rows;
+                                if (n_rows)
+                                        delete [] rows;
                         }
 
                         matrix_container_t (matrix_container_t &rhs_) = delete;
@@ -56,7 +59,7 @@ namespace matrixes
 
                         matrix_container_t& operator=(matrix_container_t &&rhs_) noexcept
                         {
-                                std::swap(rows, rhs_.rows);
+                                std::swap(rows,   rhs_.rows);
                                 std::swap(n_rows, rhs_.n_rows);
                                 std::swap(n_cols, rhs_.n_cols);
 
@@ -64,8 +67,17 @@ namespace matrixes
                         }
         };
 
+        class imatrix_t 
+        {
+                public:
+                        virtual imatrix_t&& mul (imatrix_t &rhs_) = 0;
+                        virtual size_t get_n_cols () const = 0;
+                        virtual size_t get_n_rows () const = 0;
+                        virtual ~imatrix_t () {}
+        };
+
         template <typename T>
-        class matrix_t : private matrix_container_t<T>
+        class matrix_t : private matrix_container_t<T>, public imatrix_t
         {
                 protected:
                         using matrix_container_t<T>::rows;
@@ -109,13 +121,14 @@ namespace matrixes
 
                         size_t get_n_cols () const { return n_cols; }
                         size_t get_n_rows () const { return n_rows; }
-                        void swap (size_t index1, size_t index2);
+                        inline void swap (size_t index1, size_t index2);
+                        inline imatrix_t&& mul (imatrix_t &rhs_);
 
-                        void dump () const;
+                        inline void dump () const;
         };
 
         template <typename T>
-        void matrix_t<T>::swap (size_t index1, size_t index2)
+        inline void matrix_t<T>::swap (size_t index1, size_t index2)
         {
                 auto temp    = rows[index1];
                 rows[index1] = rows[index2];
@@ -123,7 +136,25 @@ namespace matrixes
         }
 
         template <typename T>
-        void matrix_t<T>::dump () const
+        inline imatrix_t&& matrix_t<T>::mul (imatrix_t &rhs_)
+        {
+                if (n_cols != static_cast<matrix_t<T>&>(rhs_).n_rows)
+                        throw std::out_of_range("Wrong matrixes dimensions.");
+                
+                std::vector<T> new_elems {};
+                
+                for (size_t i = 0; i < n_rows; i++) {
+                        T temp {};
+                        for (size_t j = 0; j < n_cols; j++)
+                                temp += (*rows)[i][j] * (*static_cast<matrix_t<T>&>(rhs_).rows)[j][i];
+                        new_elems.push_back(temp);
+                }
+
+                return matrix_t {n_rows, n_cols, new_elems.begin(), new_elems.end()};
+        }
+
+        template <typename T>
+        inline void matrix_t<T>::dump () const
         {
                 for (size_t i = 0; i < n_rows; i++) {
                         std::cout << "[ ";

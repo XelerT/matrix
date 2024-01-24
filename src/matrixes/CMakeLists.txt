@@ -2,6 +2,7 @@ set(SRCS
         matrix.cpp
         row.cpp
         sq_matrix.cpp
+        chain.cpp
 )
 
 add_library(matrixes ${SRCS})
