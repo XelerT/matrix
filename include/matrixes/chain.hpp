@@ -18,6 +18,9 @@ namespace matrixes
                         inline void save_optimal_sequence (sq_matrix_t<size_t> &boarder_indexes, size_t i, size_t j);
 
                 public:
+                        matrix_chain_t () = default;
+                        matrix_chain_t (std::vector<std::shared_ptr<imatrix_t>> chain_) : chain(chain_) {}
+
                         void add_matrix (imatrix_t *rhs_) { chain.push_back(std::move(std::shared_ptr<imatrix_t>(rhs_))); 
                                                             found_optimal = false; }
                         size_t get_chain_length () const { return chain.size(); }
@@ -25,10 +28,57 @@ namespace matrixes
                         inline void print_optimal_sequence ();
                         inline void print_optimal_sequence (std::vector<size_t> &matrix_sizes);
 
-                        inline imatrix_t&& optimal_mul ();
-                        inline imatrix_t&& mul ();
+                        inline std::shared_ptr<imatrix_t> optimal_mul ();
+                        inline std::shared_ptr<imatrix_t> dummy_mul   ();
                         inline void compare_multiplications () const;
         };
+
+//===================================================~~~DECLARATIONS~~~====================================================================
+
+//---------------------------------------------------~~~~~~Public~~~~~~--------------------------------------------------------------------
+        
+        template <typename T>
+        inline void matrix_chain_t<T>::print_optimal_sequence ()
+        {
+                if (!found_optimal)
+                        find_optimal_sequence();
+
+                print(optimal_sequence);
+        }
+
+        template <typename T>
+        inline void matrix_chain_t<T>::print_optimal_sequence (std::vector<size_t> &matrix_sizes)
+        {
+                if (!found_optimal)
+                        find_optimal_sequence(matrix_sizes);
+
+                print(optimal_sequence);
+        }
+
+        template <typename T>
+        inline std::shared_ptr<imatrix_t> matrix_chain_t<T>::dummy_mul ()
+        {
+                if (!chain.size())
+                        throw std::out_of_range("Chain is empty.");
+                
+                std::shared_ptr<imatrix_t> temp {chain[0]};
+                for (size_t i = 1; i < chain.size(); i++) {
+                        temp = std::shared_ptr<imatrix_t> {temp->mul(*chain[i])};
+                }
+
+                return temp;
+        }
+
+        // template <typename T>
+        // inline std::shared_ptr<imatrix_t> matrix_chain_t<T>::optimal_mul ()
+        // {
+        //         if (!found_optimal)
+        //                 find_optimal_sequence();
+
+                
+        // }
+
+//---------------------------------------------------~~~~~~Private~~~~~~--------------------------------------------------------------------
 
         template <typename T>
         inline void matrix_chain_t<T>::find_optimal_sequence ()
@@ -79,22 +129,5 @@ namespace matrixes
                 } else {
                         optimal_sequence.push_back(i);
                 }
-        }
-        
-        template <typename T>
-        inline void matrix_chain_t<T>::print_optimal_sequence ()
-        {
-                if (!found_optimal)
-                        find_optimal_sequence();
-
-                print(optimal_sequence);
-        }
-        template <typename T>
-        inline void matrix_chain_t<T>::print_optimal_sequence (std::vector<size_t> &matrix_sizes)
-        {
-                if (!found_optimal)
-                        find_optimal_sequence(matrix_sizes);
-
-                print(optimal_sequence);
         }
 }

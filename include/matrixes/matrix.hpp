@@ -70,7 +70,7 @@ namespace matrixes
         class imatrix_t 
         {
                 public:
-                        virtual imatrix_t&& mul (imatrix_t &rhs_) = 0;
+                        virtual imatrix_t* mul (imatrix_t &rhs_) const = 0;
                         virtual size_t get_n_cols () const = 0;
                         virtual size_t get_n_rows () const = 0;
                         virtual ~imatrix_t () {}
@@ -102,7 +102,7 @@ namespace matrixes
                                 matrix_container_t<T>(rhs_.n_rows, rhs_.n_cols)
                         {
                                 for (size_t i = 0; i < n_rows; i++)
-                                        construct(rows[i], std::move(*rhs_.rows[i]));
+                                        construct(rows[i], *rhs_.rows[i]);
                         }
 
                         matrix_t& operator=(matrix_t &rhs_)
@@ -113,6 +113,13 @@ namespace matrixes
                         }
 
                         row_t<T>& operator[] (size_t n_row_)
+                        {
+                                if (n_row_ >= n_rows)
+                                        throw std::out_of_range("Wrong number of row.");
+                                return *rows[n_row_];
+                        }
+
+                        const row_t<T>& operator[] (size_t n_row_) const
                         { 
                                 if (n_row_ >= n_rows)
                                         throw std::out_of_range("Wrong number of row.");
@@ -122,7 +129,7 @@ namespace matrixes
                         size_t get_n_cols () const { return n_cols; }
                         size_t get_n_rows () const { return n_rows; }
                         inline void swap (size_t index1, size_t index2);
-                        inline imatrix_t&& mul (imatrix_t &rhs_);
+                        inline imatrix_t* mul (imatrix_t &rhs_) const;
 
                         inline void dump () const;
         };
@@ -136,21 +143,23 @@ namespace matrixes
         }
 
         template <typename T>
-        inline imatrix_t&& matrix_t<T>::mul (imatrix_t &rhs_)
+        inline imatrix_t* matrix_t<T>::mul (imatrix_t &rhs_) const
         {
                 if (n_cols != static_cast<matrix_t<T>&>(rhs_).n_rows)
                         throw std::out_of_range("Wrong matrixes dimensions.");
                 
                 std::vector<T> new_elems {};
-                
                 for (size_t i = 0; i < n_rows; i++) {
-                        T temp {};
-                        for (size_t j = 0; j < n_cols; j++)
-                                temp += (*rows)[i][j] * (*static_cast<matrix_t<T>&>(rhs_).rows)[j][i];
-                        new_elems.push_back(temp);
+                        for (size_t k = 0; k < static_cast<matrix_t<T>&>(rhs_).n_cols; k++) {
+                                T temp {};
+                                for (size_t j = 0; j < n_cols; j++) {
+                                        temp += (*this)[i][j] * (static_cast<matrix_t<T>&>(rhs_))[j][k];                                
+                                }
+                                new_elems.push_back(temp);
+                        }
                 }
 
-                return matrix_t {n_rows, n_cols, new_elems.begin(), new_elems.end()};
+                return new matrix_t {n_rows, static_cast<matrix_t<T>&>(rhs_).n_cols, new_elems.begin(), new_elems.end()};
         }
 
         template <typename T>
@@ -161,5 +170,20 @@ namespace matrixes
                         rows[i]->dump();
                         std::cout << " ]\n";
                 }
+        }
+
+        template <typename T>
+        bool operator== (const matrix_t<T>& lhs, const matrix_t<T>& rhs) {
+                auto lhs_n_rows = lhs.get_n_rows();
+                auto lhs_n_cols = lhs.get_n_cols();
+        
+                bool res = lhs_n_rows == rhs.get_n_rows() && lhs_n_cols == rhs.get_n_cols();
+
+                if (res)
+                        for (size_t i = 0; i < lhs_n_rows; i++)
+                                for (size_t j = 0; j < lhs_n_cols; j++)
+                                        if (lhs[i][j] != rhs[i][j])
+                                                return false;
+                return res;
         }
 }

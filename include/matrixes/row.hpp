@@ -74,7 +74,7 @@ namespace matrixes
                         row_t (row_t &&rhs_) = default;
                         row_t& operator=(row_t &&rhs_) = default;
 
-                        row_t (row_t &rhs_):
+                        row_t (const row_t &rhs_):
                                 row_container_t<T>(rhs_.size)
                         {
                                 while (size != rhs_.size) {
@@ -109,6 +109,13 @@ namespace matrixes
                         }
 
                         T& operator[] (size_t index_)
+                        {
+                                if (index_ >= size)
+                                        throw std::out_of_range("Wrong index of element.");
+                                return data[index_];
+                        }
+
+                        const T& operator[] (size_t index_) const
                         {
                                 if (index_ >= size)
                                         throw std::out_of_range("Wrong index of element.");
