@@ -20,8 +20,8 @@ namespace matrixes
                         using matrix_t<T>::n_cols;
                 public:
                         template <typename It>
-                        sq_matrix_t (size_t n_rows_, It start_, It end_):
-                                matrix_t<T>{n_rows_, n_rows_, start_, end_}
+                        sq_matrix_t (size_t n_rows_, It start_):
+                                matrix_t<T>{n_rows_, n_rows_, start_}
                         {}
 
                         std::pair<row_t<size_t>, status_t>

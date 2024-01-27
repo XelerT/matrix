@@ -17,7 +17,7 @@ int main ()
                                     n_elems_data.second.end()};
         auto det_status = matrix.det();
 #endif /*LVL1*/
-
+#define LVL2
 #ifdef LVL2
         auto n_elems_data = get_user_chain_data();
         matrix_chain_t<double> chain {};

@@ -7,7 +7,7 @@ TEST (matrix, init)
 {
         std::vector data {1, 2, 3, 4};
 
-        matrix_t<int> matrix {2, 2, data.begin(), data.end()};
+        matrix_t<int> matrix {2, 2, data.begin()};
 
         EXPECT_EQ(matrix.get_n_cols(), 2);
         EXPECT_EQ(matrix.get_n_rows(), 2);
@@ -23,7 +23,7 @@ TEST (matrix, copy_ctor)
 {
         std::vector data {1, 2, 3, 4};
 
-        matrix_t<int> matrix {2, 2, data.begin(), data.end()};
+        matrix_t<int> matrix {2, 2, data.begin()};
         matrix_t cp_matrix {matrix};
 
         EXPECT_EQ(cp_matrix.get_n_cols(), 2);
@@ -40,8 +40,8 @@ TEST (matrix, copy_ass)
         std::vector data {1, 2, 3, 4};
         std::vector data2 {4, 5, 9, 7, 1, 2};
 
-        matrix_t<int> matrix {2, 2, data.begin(), data.end()};
-        matrix_t<int> cp_matrix {3, 2, data2.begin(), data2.end()};
+        matrix_t<int> matrix {2, 2, data.begin()};
+        matrix_t<int> cp_matrix {3, 2, data2.begin()};
         cp_matrix = matrix;
 
         EXPECT_EQ(cp_matrix.get_n_cols(), 2);
@@ -58,8 +58,8 @@ TEST (matrix, equal_oper_diff_sizes)
         std::vector data {1, 2, 3, 4};
         std::vector data2 {4, 5, 9, 7, 1, 2};
 
-        matrix_t<int> matrix  {2, 2, data.begin(), data.end()};
-        matrix_t<int> matrix2 {3, 2, data2.begin(), data2.end()};
+        matrix_t<int> matrix  {2, 2, data.begin()};
+        matrix_t<int> matrix2 {3, 2, data2.begin()};
         
         ASSERT_FALSE(matrix == matrix2);
 }
@@ -69,8 +69,8 @@ TEST (matrix, equal_oper_diff_values)
         std::vector data  {1, 2, 3, 4, 0, 0};
         std::vector data2 {4, 5, 9, 7, 1, 2};
 
-        matrix_t<int> matrix  {3, 2, data.begin(), data.end()};
-        matrix_t<int> matrix2 {3, 2, data2.begin(), data2.end()};
+        matrix_t<int> matrix  {3, 2, data.begin()};
+        matrix_t<int> matrix2 {3, 2, data2.begin()};
         
         ASSERT_FALSE(matrix == matrix2);
 }
@@ -80,8 +80,8 @@ TEST (matrix, equal_oper_equal_matrixes)
         std::vector data  {1, 2, 3, 4, 0, 0};
         std::vector data2 {1, 2, 3, 4, 0, 0};
 
-        matrix_t<int> matrix  {3, 2, data.begin(), data.end()};
-        matrix_t<int> matrix2 {3, 2, data2.begin(), data2.end()};
+        matrix_t<int> matrix  {3, 2, data.begin()};
+        matrix_t<int> matrix2 {3, 2, data2.begin()};
         
         ASSERT_TRUE(matrix == matrix2);
 }
@@ -95,8 +95,8 @@ TEST (matrix, multiply_E)
                             0, 1, 0,
                             0, 0, 1};
 
-        matrix_t<int> matrix {3, 3, data.begin(), data.end()};
-        matrix_t<int> matrix_E {3, 3, E_data.begin(), E_data.end()};
+        matrix_t<int> matrix {3, 3, data.begin()};
+        matrix_t<int> matrix_E {3, 3, E_data.begin()};
 
         shared_ptr<matrix_t<int>> ans {static_cast<matrix_t<int>*>(matrix.mul(matrix_E))};
         ASSERT_TRUE(*ans == matrix);

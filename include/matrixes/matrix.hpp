@@ -86,7 +86,7 @@ namespace matrixes
 
                 public:
                         template<typename It>
-                        matrix_t (size_t n_rows_, size_t n_cols_, It begin_, It end_):
+                        matrix_t (size_t n_rows_, size_t n_cols_, It begin_):
                                 matrix_container_t<T>(n_rows_, n_cols_)
                         {
                                 for (size_t i = 0; i < n_rows; i++) {
@@ -159,7 +159,7 @@ namespace matrixes
                         }
                 }
 
-                return new matrix_t {n_rows, static_cast<matrix_t<T>&>(rhs_).n_cols, new_elems.begin(), new_elems.end()};
+                return new matrix_t {n_rows, static_cast<matrix_t<T>&>(rhs_).n_cols, new_elems.begin()};
         }
 
         template <typename T>
