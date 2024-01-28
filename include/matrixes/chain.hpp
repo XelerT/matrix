@@ -1,29 +1,15 @@
 #pragma once
 
 #include <list>
+#include <cassert>
 
 #include "utils/utils.hpp"
 #include "utils/std.hpp"
 #include "matrix.hpp"
+#include "sq_matrix.hpp"
 
 namespace matrixes
 {
-        template <typename T>
-        class chain_sequence_node_t 
-        {
-                public:
-                        using child_ptr = std::unique_ptr<chain_sequence_node_t<T>>;
-                        size_t matrix_index = MAX_SIZE_T_VALUE;
-
-                        child_ptr left_child {};
-                        child_ptr right_child {};
-
-                        chain_sequence_node_t (chain_sequence_node_t<T>* left_child_, chain_sequence_node_t<T>* right_child_):
-                                left_child(left_child_), right_child(right_child_) {}
-                        chain_sequence_node_t (size_t matrix_index_):
-                                matrix_index(matrix_index_) {} 
-        };
-
         template <typename T>
         class matrix_chain_t
         {
@@ -32,25 +18,29 @@ namespace matrixes
                         std::list<size_t> optimal_sequence {};
                         bool found_optimal = false;
 
-                        inline void find_optimal_sequence ();
-                        inline void find_optimal_sequence (std::vector<size_t> &matrix_sizes);
-                        inline void save_optimal_sequence (std::unique_ptr<chain_sequence_node_t<T>> &root);
-                        
-                        inline chain_sequence_node_t<T>* create_multiplication_tree (sq_matrix_t<size_t> &boarder_indexes, size_t i, size_t j);
-
+                        inline void save_optimal_sequence (sq_matrix_t<size_t> &boarder_indexes);
+                        inline void set_optimal_sequence  (sq_matrix_t<size_t> &boarder_indexes, size_t i, size_t j);
+                        inline void swap_first_second_matrixes_in_sequence ();
                 public:
                         matrix_chain_t () = default;
                         matrix_chain_t (std::vector<std::shared_ptr<imatrix_t>> chain_) : chain(chain_) {}
 
-                        void add_matrix (imatrix_t *rhs_) { chain.push_back(std::move(std::shared_ptr<imatrix_t>(rhs_))); 
+                        void add_matrix (imatrix_t *rhs_) { assert(rhs_); chain.push_back(std::move(std::shared_ptr<imatrix_t>(rhs_))); 
                                                             found_optimal = false; }
                         size_t get_chain_length () const { return chain.size(); }
 
                         inline void print_optimal_sequence ();
                         inline void print_optimal_sequence (std::vector<size_t> &matrix_sizes);
 
+                        inline void find_optimal_sequence ();
+                        inline void find_optimal_sequence (std::vector<size_t> &matrix_sizes);
+                        const std::list<size_t>& get_optimal_sequence () const { return optimal_sequence; }
+
                         inline std::shared_ptr<imatrix_t> optimal_mul ();
-                        inline std::shared_ptr<imatrix_t> dummy_mul   ();
+                        inline std::pair<std::shared_ptr<imatrix_t>, size_t>
+                                optimal_mul_subchain (size_t start_matrix_index);
+                        
+                        inline std::shared_ptr<imatrix_t> dummy_mul ();
                         inline void compare_multiplications () const;
         };
 
@@ -77,38 +67,6 @@ namespace matrixes
         }
 
         template <typename T>
-        inline std::shared_ptr<imatrix_t> matrix_chain_t<T>::dummy_mul ()
-        {
-                if (!chain.size())
-                        throw std::out_of_range("Chain is empty.");
-                
-                std::shared_ptr<imatrix_t> temp {chain[0]};
-                for (size_t i = 1; i < chain.size(); i++) {
-                        temp = std::shared_ptr<imatrix_t> {temp->mul(*chain[i])};
-                }
-
-                return temp;
-        }
-
-        template <typename T>
-        inline std::shared_ptr<imatrix_t> matrix_chain_t<T>::optimal_mul ()
-        {
-                if (!found_optimal)
-                        find_optimal_sequence();
-                print(optimal_sequence);
-                std::cout << " optimal seq\n";
-
-                std::shared_ptr<imatrix_t> temp {chain[0]};
-                for (auto it = ++optimal_sequence.begin(); it != optimal_sequence.end(); ++it) {
-                        temp = std::shared_ptr<imatrix_t> {temp->mul(*chain[*it])};
-                }
-
-                return temp;
-        }
-
-//---------------------------------------------------~~~~~~Private~~~~~~--------------------------------------------------------------------
-
-        template <typename T>
         inline void matrix_chain_t<T>::find_optimal_sequence ()
         {
                 size_t chain_length = get_chain_length();
@@ -119,8 +77,7 @@ namespace matrixes
                 for (size_t i = 0; i < chain_length; ++i)
                         matrixes_sizes.push_back(chain[i]->get_n_rows());
                 matrixes_sizes.push_back(chain[chain_length - 1]->get_n_cols());
-                print(matrixes_sizes);
-                std::cout << " sizes\n";
+
                 find_optimal_sequence(matrixes_sizes);
         }
 
@@ -147,36 +104,128 @@ namespace matrixes
                                 }
                         }
                 }
-                boarder_indexes.dump();
-                std::unique_ptr<chain_sequence_node_t<T>> root {create_multiplication_tree(boarder_indexes, 0, chain_length - 1)};
-                save_optimal_sequence(root);
+                // std::cout << "boarders:\n";
+                // boarder_indexes.dump();
+                // std::cout << "n_operations:\n";
+                // n_operations.dump();
+                // std::cout << n_operations[0][boarder_indexes.get_n_cols() - 1] << " n_operations\n";
+                
+                save_optimal_sequence(boarder_indexes);
+                // std::cout << "\nsequence:\n";
+                // print(optimal_sequence);
+                // std::cout << "\nend\n";
+
+                found_optimal = true;
         }
 
         template <typename T>
-        inline void matrix_chain_t<T>::save_optimal_sequence (std::unique_ptr<chain_sequence_node_t<T>> &root)
+        inline std::shared_ptr<imatrix_t> matrix_chain_t<T>::dummy_mul ()
         {
-                if (root->matrix_index != MAX_SIZE_T_VALUE) {
-                        std::cout << "pushed " << root->matrix_index << "\n";
+                if (!chain.size())
+                        throw std::out_of_range("Chain is empty.");
+                
+                std::shared_ptr<imatrix_t> temp {chain[0]};
+                for (size_t i = 1; i < chain.size(); i++) {
+                        temp = std::shared_ptr<imatrix_t> {temp->mul(*chain[i])};
+                }
 
-                        optimal_sequence.push_back(root->matrix_index);
-                } else {
-                        save_optimal_sequence(root->left_child);
-                        std::cout << "right\n";
-                        save_optimal_sequence(root->right_child);
+                return temp;
+        }
+
+        template <typename T>
+        inline std::shared_ptr<imatrix_t> matrix_chain_t<T>::optimal_mul ()
+        {
+                if (!found_optimal)
+                        find_optimal_sequence();
+
+
+
+                auto prev_it = optimal_sequence.begin();
+                std::shared_ptr<imatrix_t> temp {chain[*prev_it]};
+                
+                for (auto it = std::next(prev_it); it != optimal_sequence.end(); ++it, ++prev_it) {
+                        try {
+                                if (*it < *prev_it) {
+                                        temp = std::shared_ptr<imatrix_t> {chain[*it]->mul(*temp)};
+                                } else if (*it - *prev_it > 2 && std::distance(it, optimal_sequence.end()) != 1) {
+                                        std::cout << "HERE\n";
+                                        auto sub_chain_mul_chain_len = optimal_mul_subchain(std::distance(optimal_sequence.begin(), it));                                         
+                                        temp = std::shared_ptr<imatrix_t> {temp->mul(*sub_chain_mul_chain_len.first)};
+                                        it = std::next(it, sub_chain_mul_chain_len.second);
+                                        std::cout << "HERE2\n";
+                                } else {
+                                        temp = std::shared_ptr<imatrix_t> {temp->mul(*chain[*it])};
+                                }
+                        } catch (std::out_of_range &ore) {
+                                print_optimal_sequence();
+                                std::cout << "\nCached: out of range for this sequence--^\n";
+                                throw;
+                        }
+                }
+
+                return temp;
+        }
+
+        template <typename T>
+        inline std::pair<std::shared_ptr<imatrix_t>, size_t>
+        matrix_chain_t<T>::optimal_mul_subchain (size_t start_matrix_index)
+        {
+                if (!found_optimal)
+                        find_optimal_sequence();
+
+                auto prev_it = std::next(optimal_sequence.begin(), start_matrix_index);
+                std::shared_ptr<imatrix_t> temp {chain[*prev_it]};
+                auto it = std::next(prev_it);
+
+                for (; it != optimal_sequence.end(); ++it, ++prev_it) {
+                        if (*it < *prev_it) {
+                                        temp = std::shared_ptr<imatrix_t> {chain[*it]->mul(*temp)};
+                        } else if (*it - *prev_it > 2 && std::distance(it, optimal_sequence.end()) != 1) {
+                                std::cout << "HERE\n";
+                                auto sub_chain_mul_chain_len = optimal_mul_subchain(std::distance(optimal_sequence.begin(), it));                                         
+                                temp = std::shared_ptr<imatrix_t> {temp->mul(*sub_chain_mul_chain_len.first)};
+                                it = std::next(it, sub_chain_mul_chain_len.second);
+                                std::cout << "HERE2\n";
+                        } else {
+                                        temp = std::shared_ptr<imatrix_t> {temp->mul(*chain[*it])};
+                        }
+                }
+                return {temp, std::distance(it, optimal_sequence.begin())};
+        }
+
+
+//---------------------------------------------------~~~~~~Private~~~~~~--------------------------------------------------------------------
+
+        template <typename T>
+        inline void matrix_chain_t<T>::save_optimal_sequence (sq_matrix_t<size_t> &boarder_indexes)
+        {
+                size_t n_matrixes = boarder_indexes.get_n_cols() - 1;
+
+                set_optimal_sequence(boarder_indexes, 0, n_matrixes);
+        }
+
+        template <typename T>
+        inline void matrix_chain_t<T>::set_optimal_sequence (sq_matrix_t<size_t> &boarder_indexes, size_t i, size_t j)
+        {
+                if (j > i) {
+                        set_optimal_sequence(boarder_indexes, i, boarder_indexes[i][j]);
+                        set_optimal_sequence(boarder_indexes, boarder_indexes[i][j] + 1, j);
+
+                        optimal_sequence.push_back(boarder_indexes[i][j] + 1);
+                        if (boarder_indexes[i][j] == 0)
+                                optimal_sequence.push_back(0);
                 }
         }
 
         template <typename T>
-        inline chain_sequence_node_t<T>* matrix_chain_t<T>::create_multiplication_tree (sq_matrix_t<size_t> &boarder_indexes, 
-                                                                                        size_t i, size_t j)
+        inline void matrix_chain_t<T>::swap_first_second_matrixes_in_sequence ()
         {
-                if (j == i) {
-                        std::cout << i << " " << boarder_indexes[i][j] << " matrix\n";
-                        return new chain_sequence_node_t<T>(i);
-                }
-                auto left_child  = create_multiplication_tree(boarder_indexes, i, boarder_indexes[i][j]);
-                auto right_child = create_multiplication_tree(boarder_indexes, boarder_indexes[i][j] + 1, j);
+                auto first_index  = *optimal_sequence.begin();
+                optimal_sequence.pop_front();
+                auto second_index = *optimal_sequence.begin();
+                optimal_sequence.pop_front();
 
-                return new chain_sequence_node_t<T>(left_child, right_child);
+                optimal_sequence.push_front(first_index);
+                optimal_sequence.push_front(second_index);
         }
 }

@@ -145,6 +145,11 @@ namespace matrixes
         template <typename T>
         inline imatrix_t* matrix_t<T>::mul (imatrix_t &rhs_) const
         {
+                // dump();
+                // std::cout << "\n";
+                // static_cast<matrix_t<T>&>(rhs_).dump();
+                // std::cout << "\n";
+
                 if (n_cols != static_cast<matrix_t<T>&>(rhs_).n_rows)
                         throw std::out_of_range("Wrong matrixes dimensions.");
                 

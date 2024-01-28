@@ -6,6 +6,7 @@
 
 using namespace std;
 using namespace std::chrono;
+using namespace matrixes;
 
 pair<size_t, vector<double>>
 get_user_data ()
@@ -42,4 +43,37 @@ get_user_chain_data ()
                 throw std::runtime_error("You need to enter digits.");
 
         return {n_matrixes, sizes};
+}
+
+vector<int> get_matrixes ()
+{
+        size_t n_data;
+        cin >> n_data;
+
+        vector<int> sizes_elems {};
+        int input;
+
+        while (sizes_elems.size() != n_data && std::cin >> input)
+                sizes_elems.push_back(input);
+
+        if (std::cin.fail() && !std::cin.eof())
+                throw std::runtime_error("You need to enter digits.");
+
+        return sizes_elems;
+}
+
+matrix_chain_t<int> create_matrix_chain (vector<int> &sizes_elems)
+{
+        matrix_chain_t<int> chain {};
+
+        for (auto it = sizes_elems.begin(); it != sizes_elems.end();) {
+                int n_rows = *it++;
+                int n_cols = *it++;
+                int n_matrix_elems = n_rows * n_cols;
+
+                chain.add_matrix(new matrix_t<int> (n_rows, n_cols, it));
+                it += n_matrix_elems;
+        }
+
+        return chain;
 }
