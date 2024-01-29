@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 
 #include "matrix.hpp"
 #include "sq_matrix.hpp"
@@ -7,6 +8,11 @@
 
 using namespace std;
 using namespace matrixes;
+
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
 
 int main ()
 {
@@ -32,13 +38,21 @@ int main ()
         auto elems = get_matrixes();
         auto chain = create_matrix_chain(elems);
 
-        cout << "optimal_mul result:\n";
+        auto t1 = high_resolution_clock::now();
         auto ans_matrix = chain.optimal_mul();
-        reinterpret_cast<matrix_t<int>*>(ans_matrix.get())->dump();
+        auto t2 = high_resolution_clock::now();
+
+        duration<double, std::milli> delta_time = t2 - t1;        
+        cout << "optimal_mul result: " << delta_time << "\n";
+        // reinterpret_cast<matrix_t<int>*>(ans_matrix.get())->dump();
         
-        cout << "dummy_mul result:\n";
+        t1 = high_resolution_clock::now();        
         auto dummy_ans_matrix = chain.dummy_mul();
-        reinterpret_cast<matrix_t<int>*>(dummy_ans_matrix.get())->dump();
+        t2 = high_resolution_clock::now();
+
+        delta_time = t2 - t1;      
+        cout << "dummy_mul result: " << delta_time << "\n";
+        // reinterpret_cast<matrix_t<int>*>(dummy_ans_matrix.get())->dump();
 #endif /*TESTS*/
 
         return 0;

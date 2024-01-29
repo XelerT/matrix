@@ -101,13 +101,13 @@ def gen_data(file_name):
 
         largest_matrix_index = random.randint(0, 5)
 
-        matrixes_sizes = [random.randint(10, 10), random.randint(10, 10)]
+        matrixes_sizes = [random.randint(10, 100), random.randint(10, 100)]
 
         for i in range(len(matrixes_sizes), n_matrixes + 1):
                 if (len(matrixes_sizes) % 2 == 0):
-                        matrixes_sizes.insert(0, random.randint(1, 5))
+                        matrixes_sizes.insert(0, random.randint(1, 50))
                 else:
-                        matrixes_sizes.append(random.randint(1, 5))
+                        matrixes_sizes.append(random.randint(1, 50))
 
         matrixes = []
         n_elems = 0

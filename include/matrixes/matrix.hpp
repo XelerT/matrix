@@ -67,17 +67,23 @@ namespace matrixes
                         }
         };
 
+        template <typename T>
         class imatrix_t 
         {
                 public:
-                        virtual imatrix_t* mul (imatrix_t &rhs_) const = 0;
+                        virtual imatrix_t<T>* mul (imatrix_t<T> &rhs_) const = 0;
+                        
                         virtual size_t get_n_cols () const = 0;
                         virtual size_t get_n_rows () const = 0;
+
+                        virtual       row_t<T>& operator[] (size_t n_row_)       = 0;
+                        virtual const row_t<T>& operator[] (size_t n_row_) const = 0;
+                        
                         virtual ~imatrix_t () {}
         };
 
         template <typename T>
-        class matrix_t : private matrix_container_t<T>, public imatrix_t
+        class matrix_t : private matrix_container_t<T>, public imatrix_t<T>
         {
                 protected:
                         using matrix_container_t<T>::rows;
@@ -129,7 +135,7 @@ namespace matrixes
                         size_t get_n_cols () const { return n_cols; }
                         size_t get_n_rows () const { return n_rows; }
                         inline void swap (size_t index1, size_t index2);
-                        inline imatrix_t* mul (imatrix_t &rhs_) const;
+                        inline imatrix_t<T>* mul (imatrix_t<T> &rhs_) const;
 
                         inline void dump () const;
         };
@@ -143,7 +149,7 @@ namespace matrixes
         }
 
         template <typename T>
-        inline imatrix_t* matrix_t<T>::mul (imatrix_t &rhs_) const
+        inline imatrix_t<T>* matrix_t<T>::mul (imatrix_t<T> &rhs_) const
         {
                 // dump();
                 // std::cout << "\n";
