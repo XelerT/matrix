@@ -24,7 +24,7 @@ int main ()
         auto det_status = matrix.det();
 #endif /*LVL1*/
 
-// #define LVL2
+#define LVL2
 
 #ifdef LVL2
         auto n_elems_data = get_user_chain_data();
@@ -32,7 +32,7 @@ int main ()
         chain.print_optimal_sequence(n_elems_data.second);
 #endif /*LVL2*/
 
-#define TESTS
+// #define TESTS
 
 #ifdef TESTS
         auto elems = get_matrixes();
@@ -44,7 +44,6 @@ int main ()
 
         duration<double, std::milli> delta_time = t2 - t1;        
         cout << "optimal_mul result: " << delta_time << "\n";
-        // reinterpret_cast<matrix_t<int>*>(ans_matrix.get())->dump();
         
         t1 = high_resolution_clock::now();        
         auto dummy_ans_matrix = chain.dummy_mul();
@@ -52,7 +51,6 @@ int main ()
 
         delta_time = t2 - t1;      
         cout << "dummy_mul result: " << delta_time << "\n";
-        // reinterpret_cast<matrix_t<int>*>(dummy_ans_matrix.get())->dump();
 #endif /*TESTS*/
 
         return 0;

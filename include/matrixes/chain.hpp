@@ -25,7 +25,8 @@ namespace matrixes
 
                         inline void save_optimal_sequence ();
                         inline void set_optimal_sequence  (size_t i, size_t j);
-                        inline void swap_first_second_matrixes_in_sequence ();
+                        inline void set_default_sequence ();
+
                 public:
                         matrix_chain_t () = default;
                         matrix_chain_t (std::vector<imatrix_shptr> chain_) : chain(chain_) {}
@@ -112,12 +113,13 @@ namespace matrixes
                         }
                 }
                 // std::cout << "boarders:\n";
-                // boarder_indexes.dump();
+                // boarder_indexes->dump();
                 // std::cout << "n_operations:\n";
                 // n_operations.dump();
-                // std::cout << n_operations[0][boarder_indexes.get_n_cols() - 1] << " n_operations\n";
+                // std::cout << n_operations[0][boarder_indexes->get_n_cols() - 1] << " n_operations\n";
                 
                 save_optimal_sequence();
+                
                 // std::cout << "\nsequence:\n";
                 // print(optimal_sequence);
                 // std::cout << "\nend\n";
@@ -176,22 +178,16 @@ namespace matrixes
                 if (j > i) {
                         set_optimal_sequence(i, (*boarder_indexes)[i][j]);
                         set_optimal_sequence((*boarder_indexes)[i][j] + 1, j);
-
-                        optimal_sequence.push_back((*boarder_indexes)[i][j] + 1);
-                        if ((*boarder_indexes)[i][j] == 0)
-                                optimal_sequence.push_back(0);
+                        
+                        optimal_sequence.push_back((*boarder_indexes)[i][j]);
                 }
         }
 
         template <typename T>
-        inline void matrix_chain_t<T>::swap_first_second_matrixes_in_sequence ()
+        inline void matrix_chain_t<T>::set_default_sequence ()
         {
-                auto first_index  = *optimal_sequence.begin();
-                optimal_sequence.pop_front();
-                auto second_index = *optimal_sequence.begin();
-                optimal_sequence.pop_front();
-
-                optimal_sequence.push_front(first_index);
-                optimal_sequence.push_front(second_index);
+                size_t n_muls = boarder_indexes->get_n_cols() - 1;
+                for (size_t i = 0; i < n_muls; ++i)
+                        optimal_sequence.push_back(i);
         }
 }
