@@ -135,7 +135,7 @@ def run_e2e_test(app2run, input_data):
                         f"Run {app2run}."               + \
                 TERMINAL_COLORS.DEFAULT
                 )
-        pipe = Popen([app2run], stdout=PIPE, stdin=PIPE)
+        pipe = Popen([app2run, "--mul=true"], stdout=PIPE, stdin=PIPE)
         
         data_str = str()
         for data in input_data:
@@ -150,7 +150,7 @@ def run_e2e_test(app2run, input_data):
 
 def check_app_output(n_test, data, output_data, exec_time, correct_output=str()):
         # correct_str = ''.join(str(elem) for elem in correct_output)
-        check_output_data(n_test, output_data[:-2], exec_time)
+        check_output_data(n_test, output_data[:-1], exec_time)
 
 
 def run_e2e_tests(app_name, app2_name=str()):

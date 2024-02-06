@@ -4,11 +4,14 @@ project(matrix)
 
 #build flags
 include(cmake/build_flags.cmake)
+include(cmake/link_flags.cmake)
 
 # version
 set(CMAKE_CXX_STANDARD 20)
 # if (NOT CMAKE_CXX_STANDARD OR NOT CMAKE_CXX_COMPILER)
 # endif()
+
+find_package( Boost 1.40 COMPONENTS program_options REQUIRED )
 
 message("CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}")
 message("CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
