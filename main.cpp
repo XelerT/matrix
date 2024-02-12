@@ -41,14 +41,14 @@ int main (int argc, const char *argv[])
                 auto t2 = high_resolution_clock::now();
 
                 duration<double, std::milli> delta_time = t2 - t1;        
-                cout << "optimal_mul result: " << delta_time << "\n";
+                cout << "optimal_mul result: " << delta_time.count() <<  "ms\n";
                 
                 t1 = high_resolution_clock::now();        
                 auto dummy_ans_matrix = chain.dummy_mul();
                 t2 = high_resolution_clock::now();
 
                 delta_time = t2 - t1;      
-                cout << "dummy_mul result: " << delta_time << "\n";
+                cout << "dummy_mul result: " << delta_time.count() << " ms\n";
         } else {
                 auto n_elems_data = get_user_chain_data();
                 matrix_chain_t<double> chain {};
