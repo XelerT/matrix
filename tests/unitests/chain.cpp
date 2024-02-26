@@ -40,6 +40,10 @@ TEST (matrix_chain_optimal_sequences, not_linear1)
         chain.find_optimal_sequence(data);
         auto ans = chain.get_optimal_sequence();
 
+        for (auto a : ans)
+                std::cout << a << " ";
+        std::cout << std::endl;
+
         ASSERT_TRUE(ans == ans_data);
 }
 
@@ -47,7 +51,7 @@ TEST (matrix_chain_optimal_sequences, not_linear2)
 {
         std::vector<size_t> data {40, 20, 30, 10, 30};
 
-        std::list<size_t> ans_data {1, 2, 0, 3};
+        std::list<size_t> ans_data {1, 0, 2};
 
         matrix_chain_t<double> chain {};
         chain.find_optimal_sequence(data);
@@ -67,12 +71,13 @@ TEST (matrix_chain_dummy_mul, E_E_mul)
 
         matrix_t<int> matrix {3, 3, data.begin()};
 
-        std::vector<std::shared_ptr<imatrix_t>> matrixes {std::shared_ptr<imatrix_t>{new matrix_t<int> {matrix}}, std::shared_ptr<imatrix_t>{new matrix_t<int> {3, 3, E_data.begin()}}, 
-                                                                                      std::shared_ptr<imatrix_t>{new matrix_t<int> {3, 3, E_data.begin()}}};
+        std::vector<std::shared_ptr<imatrix_t<int>>> matrixes {std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {matrix}}, 
+                                                          std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {3, 3, E_data.begin()}}, 
+                                                          std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {3, 3, E_data.begin()}}};
         EXPECT_EQ(matrix[0].get_size(), 3);
         matrix_chain_t<int> chain {matrixes};
 
-        std::shared_ptr<imatrix_t> ans_matrix = chain.dummy_mul();
+        std::shared_ptr<imatrix_t<int>> ans_matrix = chain.dummy_mul();
 
         EXPECT_EQ(ans_matrix->get_n_cols(), 3);
         EXPECT_EQ(ans_matrix->get_n_rows(), 3);
@@ -91,12 +96,13 @@ TEST (matrix_chain_opt_mul, E_E_mul)
 
         matrix_t<int> matrix {3, 3, data.begin()};
 
-        std::vector<std::shared_ptr<imatrix_t>> matrixes {std::shared_ptr<imatrix_t>{new matrix_t<int> {matrix}}, std::shared_ptr<imatrix_t>{new matrix_t<int> {3, 3, E_data.begin()}}, 
-                                                                                      std::shared_ptr<imatrix_t>{new matrix_t<int> {3, 3, E_data.begin()}}};
+        std::vector<std::shared_ptr<imatrix_t<int>>> matrixes {std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {matrix}},
+                                                               std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {3, 3, E_data.begin()}}, 
+                                                               std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {3, 3, E_data.begin()}}};
         EXPECT_EQ(matrix[0].get_size(), 3);
         matrix_chain_t<int> chain {matrixes};
 
-        std::shared_ptr<imatrix_t> ans_matrix = chain.optimal_mul();
+        std::shared_ptr<imatrix_t<int>> ans_matrix = chain.optimal_mul();
 
         EXPECT_EQ(ans_matrix->get_n_cols(), 3);
         EXPECT_EQ(ans_matrix->get_n_rows(), 3);
@@ -116,12 +122,12 @@ TEST (matrix_chain_opt_mul, O_O_mul)
         matrix_t<int> matrix {3, 3, data.begin()};
         matrix_t<int> O_matrix {3, 3, O_data.begin()};
 
-        std::vector<std::shared_ptr<imatrix_t>> matrixes {std::shared_ptr<imatrix_t>{new matrix_t<int> {matrix}}, std::shared_ptr<imatrix_t>{new matrix_t<int> {3, 3, O_data.begin()}}, 
-                                                                                      std::shared_ptr<imatrix_t>{new matrix_t<int> {3, 3, O_data.begin()}}};
+        std::vector<std::shared_ptr<imatrix_t<int>>> matrixes {std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {matrix}}, std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {3, 3, O_data.begin()}}, 
+                                                                                      std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {3, 3, O_data.begin()}}};
         EXPECT_EQ(matrix[0].get_size(), 3);
         matrix_chain_t<int> chain {matrixes};
 
-        std::shared_ptr<imatrix_t> ans_matrix = chain.optimal_mul();
+        std::shared_ptr<imatrix_t<int>> ans_matrix = chain.optimal_mul();
 
         EXPECT_EQ(ans_matrix->get_n_cols(), 3);
         EXPECT_EQ(ans_matrix->get_n_rows(), 3);
@@ -146,10 +152,10 @@ TEST (matrix_chain_opt_mul, two_diff_matrixes)
 
         matrix_t<int> ans {3, 2, ans_data.begin()};
 
-        std::vector<std::shared_ptr<imatrix_t>> matrixes {std::shared_ptr<imatrix_t>{new matrix_t<int> {matrix}}, std::shared_ptr<imatrix_t>{new matrix_t<int> {matrix2}}};
+        std::vector<std::shared_ptr<imatrix_t<int>>> matrixes {std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {matrix}}, std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {matrix2}}};
         matrix_chain_t<int> chain {matrixes};
 
-        std::shared_ptr<imatrix_t> ans_matrix = chain.optimal_mul();
+        std::shared_ptr<imatrix_t<int>> ans_matrix = chain.optimal_mul();
 
         EXPECT_EQ(ans_matrix->get_n_cols(), 2);
         EXPECT_EQ(ans_matrix->get_n_rows(), 3);
@@ -177,12 +183,12 @@ TEST (matrix_chain_opt_mul, tree_diff_matrixes)
 
         matrix_t<int> ans {3, 1, ans_data.begin()};
 
-        std::vector<std::shared_ptr<imatrix_t>> matrixes {std::shared_ptr<imatrix_t>{new matrix_t<int> {matrix}},
-                                                          std::shared_ptr<imatrix_t>{new matrix_t<int> {matrix2}},
-                                                          std::shared_ptr<imatrix_t>{new matrix_t<int> {matrix3}}};
+        std::vector<std::shared_ptr<imatrix_t<int>>> matrixes {std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {matrix}},
+                                                          std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {matrix2}},
+                                                          std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {matrix3}}};
         matrix_chain_t<int> chain {matrixes};
 
-        std::shared_ptr<imatrix_t> ans_matrix = chain.optimal_mul();
+        std::shared_ptr<imatrix_t<int>> ans_matrix = chain.optimal_mul();
 
         EXPECT_EQ(ans_matrix->get_n_cols(), 1);
         EXPECT_EQ(ans_matrix->get_n_rows(), 3);
@@ -216,12 +222,12 @@ TEST (matrix_chain_opt_mul, tree_diff_matrixes_not_linear)
 
         matrix_t<int> ans {4, 1, ans_data.begin()};
 
-        std::vector<std::shared_ptr<imatrix_t>> matrixes {std::shared_ptr<imatrix_t>{new matrix_t<int> {matrix}},
-                                                          std::shared_ptr<imatrix_t>{new matrix_t<int> {matrix2}},
-                                                          std::shared_ptr<imatrix_t>{new matrix_t<int> {matrix3}}};
+        std::vector<std::shared_ptr<imatrix_t<int>>> matrixes {std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {matrix}},
+                                                          std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {matrix2}},
+                                                          std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {matrix3}}};
         matrix_chain_t<int> chain {matrixes};
 
-        std::shared_ptr<imatrix_t> ans_matrix = chain.optimal_mul();
+        std::shared_ptr<imatrix_t<int>> ans_matrix = chain.optimal_mul();
 
         // static_cast<matrix_t<int>*>(ans_matrix.get())->dump();
 
@@ -251,12 +257,12 @@ TEST (matrix_chain_opt_mul, E_E_matrixes_not_linear)
 
         matrix_t<int> ans {5, 1, ans_data.begin()};
 
-        std::vector<std::shared_ptr<imatrix_t>> matrixes {std::shared_ptr<imatrix_t>{new matrix_t<int> {matrix}},
-                                                          std::shared_ptr<imatrix_t>{new matrix_t<int> {matrix2}},
-                                                          std::shared_ptr<imatrix_t>{new matrix_t<int> {matrix3}}};
+        std::vector<std::shared_ptr<imatrix_t<int>>> matrixes {std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {matrix}},
+                                                          std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {matrix2}},
+                                                          std::shared_ptr<imatrix_t<int>>{new matrix_t<int> {matrix3}}};
         matrix_chain_t<int> chain {matrixes};
 
-        std::shared_ptr<imatrix_t> ans_matrix = chain.optimal_mul();
+        std::shared_ptr<imatrix_t<int>> ans_matrix = chain.optimal_mul();
 
         // static_cast<matrix_t<int>*>(ans_matrix.get())->dump();
 

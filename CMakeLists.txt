@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 20)
 # if (NOT CMAKE_CXX_STANDARD OR NOT CMAKE_CXX_COMPILER)
 # endif()
 
-find_package( Boost 1.40 COMPONENTS program_options REQUIRED )
+find_package(Boost 1.40 COMPONENTS program_options REQUIRED )
 
 message("CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}")
 message("CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
@@ -37,6 +37,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 # srcs
 
 foreach(SRC ${SRC_LIST})
+        target_compile_options(${SRC} PUBLIC "$<$<CONFIG:Debug>:${DEBUG_BUILD}>")
+        target_link_options(${SRC}    PUBLIC "$<$<CONFIG:Debug>:${DEBUG_LINK}>")
+
+        target_link_options(${SRC}    PUBLIC "${LINK}")
+
         target_include_directories(${SRC} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/${SRC})
         target_include_directories(${SRC} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
                 
@@ -46,6 +51,11 @@ endforeach()
 # create main.cpp
 
 add_executable(${PROJECT_NAME} main.cpp)
+
+target_compile_options(${PROJECT_NAME} PUBLIC "$<$<CONFIG:Debug>:${DEBUG_BUILD}>")
+target_link_options(${PROJECT_NAME}    PUBLIC "$<$<CONFIG:Debug>:${DEBUG_LINK}>")
+
+target_link_options(${PROJECT_NAME}    PUBLIC "${LINK}")
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(${PROJECT_NAME} ${SRC_LIST})
@@ -61,13 +71,3 @@ endif()
 # 
 
 install()
-
-#custom targets
-
-# add_custom_target(dot ALL
-#         COMMAND ${CMAKE_COMMAND} "--graphviz=tree.dot" .
-#         COMMAND dot -T png tree.dot -o tree.png
-#         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-# )
-
-#
