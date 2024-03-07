@@ -3,6 +3,8 @@ set(SRCS
         row.cpp
         sq_matrix.cpp
         chain.cpp
+        lazy.cpp
+        imatrix.cpp
 )
 
 add_library(matrixes ${SRCS})

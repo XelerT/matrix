@@ -4,7 +4,7 @@
 #include <memory>
 #include <iterator>
 
-#include "row.hpp"
+#include "imatrix.hpp"
 
 namespace matrixes
 {
@@ -68,21 +68,6 @@ namespace matrixes
         };
 
         template <typename T>
-        class imatrix_t 
-        {
-                public:
-                        virtual imatrix_t<T>* mul (imatrix_t<T> &rhs_) const = 0;
-                        
-                        virtual size_t get_n_cols () const = 0;
-                        virtual size_t get_n_rows () const = 0;
-
-                        virtual       row_t<T>& operator[] (size_t n_row_)       = 0;
-                        virtual const row_t<T>& operator[] (size_t n_row_) const = 0;
-                        
-                        virtual ~imatrix_t () {}
-        };
-
-        template <typename T>
         class matrix_t : private matrix_container_t<T>, public imatrix_t<T>
         {
                 protected:
@@ -91,7 +76,7 @@ namespace matrixes
                         using matrix_container_t<T>::n_cols;
 
                 public:
-                        template<typename It>
+                        template <typename It>
                         matrix_t (size_t n_rows_, size_t n_cols_, It begin_):
                                 matrix_container_t<T>(n_rows_, n_cols_)
                         {
@@ -99,7 +84,7 @@ namespace matrixes
                                         construct(rows[i], std::move(row_t<T>(begin_, begin_ + n_cols)));
                                         begin_ += n_cols;
                                 }
-                        };
+                        }
 
                         matrix_t (matrix_t &&rhs) = default;
                         matrix_t& operator=(matrix_t &&rhs) = default;
