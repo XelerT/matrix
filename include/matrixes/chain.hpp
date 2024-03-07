@@ -23,9 +23,9 @@ namespace matrixes
                         index_matrix_shptr boarder_indexes {};
                         bool found_optimal = false;
 
-                        inline void save_optimal_sequence ();
-                        inline void set_optimal_sequence  (size_t i, size_t j);
-                        inline void set_default_sequence ();
+                        void save_optimal_sequence ();
+                        void set_optimal_sequence  (size_t i, size_t j);
+                        void set_default_sequence  ();
 
                 public:
                         matrix_chain_t () = default;
@@ -36,20 +36,20 @@ namespace matrixes
                                                                found_optimal = false; }
                         size_t get_chain_length () const { return chain.size(); }
 
-                        inline void print_optimal_sequence ();
-                        inline void print_optimal_sequence (std::vector<size_t> &matrix_sizes);
+                        void print_optimal_sequence ();
+                        void print_optimal_sequence (std::vector<size_t> &matrix_sizes);
 
-                        inline void find_optimal_sequence ();
-                        inline void find_optimal_sequence (std::vector<size_t> &matrix_sizes);
+                        void find_optimal_sequence ();
+                        void find_optimal_sequence (std::vector<size_t> &matrix_sizes);
                         const std::list<size_t>& get_optimal_sequence () const { return optimal_sequence; }
 
-                        inline imatrix_shptr optimal_mul ();
-                        inline imatrix_shptr optimal_mul_req (size_t i, size_t j);
-                        inline std::pair<imatrix_shptr, size_t>
+                        imatrix_shptr optimal_mul ();
+                        imatrix_shptr optimal_mul_req (size_t i, size_t j);
+                        std::pair<imatrix_shptr, size_t>
                                 optimal_mul_subchain (size_t start_matrix_index);
                         
-                        inline imatrix_shptr dummy_mul ();
-                        inline void compare_multiplications () const;
+                        imatrix_shptr dummy_mul ();
+                        void compare_multiplications () const;
         };
 
 //===================================================~~~DECLARATIONS~~~====================================================================
@@ -57,7 +57,7 @@ namespace matrixes
 //---------------------------------------------------~~~~~~Public~~~~~~--------------------------------------------------------------------
         
         template <typename T>
-        inline void matrix_chain_t<T>::print_optimal_sequence ()
+        void matrix_chain_t<T>::print_optimal_sequence ()
         {
                 if (!found_optimal)
                         find_optimal_sequence();
@@ -66,7 +66,7 @@ namespace matrixes
         }
 
         template <typename T>
-        inline void matrix_chain_t<T>::print_optimal_sequence (std::vector<size_t> &matrix_sizes)
+        void matrix_chain_t<T>::print_optimal_sequence (std::vector<size_t> &matrix_sizes)
         {
                 if (!found_optimal)
                         find_optimal_sequence(matrix_sizes);
@@ -75,7 +75,7 @@ namespace matrixes
         }
 
         template <typename T>
-        inline void matrix_chain_t<T>::find_optimal_sequence ()
+        void matrix_chain_t<T>::find_optimal_sequence ()
         {
                 size_t chain_length = get_chain_length();
                 if (!chain_length)
@@ -90,7 +90,7 @@ namespace matrixes
         }
 
         template <typename T>
-        inline void matrix_chain_t<T>::find_optimal_sequence (std::vector<size_t> &matrixes_sizes)
+        void matrix_chain_t<T>::find_optimal_sequence (std::vector<size_t> &matrixes_sizes)
         {
                 size_t chain_length = matrixes_sizes.size() - 1; // -1 because of n_rows of last matrix
 
@@ -112,23 +112,12 @@ namespace matrixes
                                 }
                         }
                 }
-                // std::cout << "boarders:\n";
-                // boarder_indexes->dump();
-                // std::cout << "n_operations:\n";
-                // n_operations.dump();
-                // std::cout << n_operations[0][boarder_indexes->get_n_cols() - 1] << " n_operations\n";
-                
                 save_optimal_sequence();
-                
-                // std::cout << "\nsequence:\n";
-                // print(optimal_sequence);
-                // std::cout << "\nend\n";
-
                 found_optimal = true;
         }
 
         template <typename T>
-        inline std::shared_ptr<imatrix_t<T>> matrix_chain_t<T>::dummy_mul ()
+        std::shared_ptr<imatrix_t<T>> matrix_chain_t<T>::dummy_mul ()
         {
                 if (!chain.size())
                         throw std::out_of_range("Chain is empty.");
@@ -142,7 +131,7 @@ namespace matrixes
         }
 
         template <typename T>
-        inline std::shared_ptr<imatrix_t<T>> matrix_chain_t<T>::optimal_mul ()
+        std::shared_ptr<imatrix_t<T>> matrix_chain_t<T>::optimal_mul ()
         {
                 if (!found_optimal)
                         find_optimal_sequence();
@@ -153,7 +142,7 @@ namespace matrixes
 //---------------------------------------------------~~~~~~Private~~~~~~--------------------------------------------------------------------
 
         template <typename T>
-        inline std::shared_ptr<imatrix_t<T>> matrix_chain_t<T>::optimal_mul_req (size_t i, size_t j)
+        std::shared_ptr<imatrix_t<T>> matrix_chain_t<T>::optimal_mul_req (size_t i, size_t j)
         {
                 if (j > i) {
                         auto temp_lhs = optimal_mul_req(i, (*boarder_indexes)[i][j]);
@@ -165,7 +154,7 @@ namespace matrixes
         }
 
         template <typename T>
-        inline void matrix_chain_t<T>::save_optimal_sequence ()
+        void matrix_chain_t<T>::save_optimal_sequence ()
         {
                 size_t n_matrixes = boarder_indexes->get_n_cols() - 1;
 
@@ -173,7 +162,7 @@ namespace matrixes
         }
 
         template <typename T>
-        inline void matrix_chain_t<T>::set_optimal_sequence (size_t i, size_t j)
+        void matrix_chain_t<T>::set_optimal_sequence (size_t i, size_t j)
         {
                 if (j > i) {
                         set_optimal_sequence(i, (*boarder_indexes)[i][j]);
@@ -184,7 +173,7 @@ namespace matrixes
         }
 
         template <typename T>
-        inline void matrix_chain_t<T>::set_default_sequence ()
+        void matrix_chain_t<T>::set_default_sequence ()
         {
                 size_t n_muls = boarder_indexes->get_n_cols() - 1;
                 for (size_t i = 0; i < n_muls; ++i)

@@ -134,14 +134,14 @@ namespace matrixes
 
                         size_t get_n_cols () const { return n_cols; }
                         size_t get_n_rows () const { return n_rows; }
-                        inline void swap (size_t index1, size_t index2);
-                        inline imatrix_t<T>* mul (imatrix_t<T> &rhs_) const;
+                        void swap (size_t index1, size_t index2);
+                        imatrix_t<T>* mul (imatrix_t<T> &rhs_) const;
 
-                        inline void dump () const;
+                        void dump () const;
         };
 
         template <typename T>
-        inline void matrix_t<T>::swap (size_t index1, size_t index2)
+        void matrix_t<T>::swap (size_t index1, size_t index2)
         {
                 auto temp    = rows[index1];
                 rows[index1] = rows[index2];
@@ -149,13 +149,8 @@ namespace matrixes
         }
 
         template <typename T>
-        inline imatrix_t<T>* matrix_t<T>::mul (imatrix_t<T> &rhs_) const
+        imatrix_t<T>* matrix_t<T>::mul (imatrix_t<T> &rhs_) const
         {
-                // dump();
-                // std::cout << "\n";
-                // static_cast<matrix_t<T>&>(rhs_).dump();
-                // std::cout << "\n";
-
                 if (n_cols != static_cast<matrix_t<T>&>(rhs_).n_rows)
                         throw std::out_of_range("Wrong matrixes dimensions.");
                 
@@ -174,7 +169,7 @@ namespace matrixes
         }
 
         template <typename T>
-        inline void matrix_t<T>::dump () const
+        void matrix_t<T>::dump () const
         {
                 for (size_t i = 0; i < n_rows; i++) {
                         std::cout << "[ ";
