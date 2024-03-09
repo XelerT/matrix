@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+#include "imatrix.hpp"
+
 namespace matrixes
 {
         template <typename T>
@@ -146,12 +148,20 @@ namespace matrixes
                         lazy_matrix_t& operator*= (lazy_matrix_t &rhs);
                         lazy_matrix_t& operator+=(const lazy_matrix_t &rhs);
                         lazy_matrix_t& operator-=(const lazy_matrix_t &rhs);
+                        lazy_matrix_t& operator*= (const T &rhs);
+                        lazy_matrix_t& operator/= (const T &rhs);
+                        lazy_matrix_t& operator+=(const T &rhs);
+                        lazy_matrix_t& operator-=(const T &rhs);
 
                         private:
-                                void prepare_before_operate (const lazy_matrix_t &rhs) 
+                                void check_sizes (const lazy_matrix_t &rhs) 
                                 {
                                         if (get_n_rows() != rhs.get_n_rows())
                                                 throw std::runtime_error("Lazy matrixes cannot operate with different sizes.");
+                                }
+
+                                void prepare_before_operate () 
+                                {
                                         if (container->get_linked_with() > 1) {
                                                 auto temp = container;
                                                 container.reset(container->clone());
@@ -195,7 +205,7 @@ namespace matrixes
         {
                 std::vector<T> new_elems = mul_container(rhs_);
 
-                return new lazy_matrix_t {get_n_rows(), static_cast<matrix_t<T>&>(rhs_).get_n_cols(), new_elems.begin()};
+                return new lazy_matrix_t {get_n_rows(), static_cast<imatrix_t<T>&>(rhs_).get_n_cols(), new_elems.begin()};
         }
 
         template <typename T>
@@ -213,8 +223,7 @@ namespace matrixes
         lazy_matrix_t<T>& lazy_matrix_t<T>::operator*= (lazy_matrix_t &rhs)
         {
                 auto n_cols = container->get_n_cols(); 
-                if (n_cols != static_cast<lazy_matrix_t<T>&>(rhs).get_n_rows())
-                        throw std::out_of_range("Wrong matrixes dimensions.");
+                check_sizes(rhs);
 
                 if (container->get_linked_with() > 1) {
                         std::vector<T> new_elems = mul_container(rhs);
@@ -236,7 +245,8 @@ namespace matrixes
         template <typename T>
         lazy_matrix_t<T>& lazy_matrix_t<T>::operator+= (const lazy_matrix_t &rhs)
         {
-                prepare_before_operate(rhs);
+                check_sizes(rhs);
+                prepare_before_operate();
                                 
                 size_t n_rows = get_n_rows();
                 for (size_t i = 0; i < n_rows; i++)
@@ -248,11 +258,60 @@ namespace matrixes
         template <typename T>
         lazy_matrix_t<T>& lazy_matrix_t<T>::operator-= (const lazy_matrix_t &rhs)
         {
-                prepare_before_operate(rhs);
+                check_sizes(rhs);
+                prepare_before_operate();
                                 
                 size_t n_rows = get_n_rows();
                 for (size_t i = 0; i < n_rows; i++)
                         *(*container)[i] -= rhs[i];
+
+                return *this;
+        }
+
+        template <typename T>
+        lazy_matrix_t<T>& lazy_matrix_t<T>::operator*= (const T &rhs)
+        {
+                prepare_before_operate();
+                                
+                size_t n_rows = get_n_rows();
+                for (size_t i = 0; i < n_rows; i++)
+                        *(*container)[i] *= rhs;
+
+                return *this;
+        }
+
+        template <typename T>
+        lazy_matrix_t<T>& lazy_matrix_t<T>::operator/= (const T &rhs)
+        {
+                prepare_before_operate();
+                                
+                size_t n_rows = get_n_rows();
+                for (size_t i = 0; i < n_rows; i++)
+                        *(*container)[i] /= rhs;
+
+                return *this;
+        }
+
+        template <typename T>
+        lazy_matrix_t<T>& lazy_matrix_t<T>::operator+= (const T &rhs)
+        {
+                prepare_before_operate();
+                                
+                size_t n_rows = get_n_rows();
+                for (size_t i = 0; i < n_rows; i++)
+                        *(*container)[i] += rhs;
+
+                return *this;
+        }
+
+        template <typename T>
+        lazy_matrix_t<T>& lazy_matrix_t<T>::operator-= (const T &rhs)
+        {
+                prepare_before_operate();
+                                
+                size_t n_rows = get_n_rows();
+                for (size_t i = 0; i < n_rows; i++)
+                        *(*container)[i] -= rhs;
 
                 return *this;
         }

@@ -2,6 +2,7 @@ set(SRC_LIST
         matrixes
         ui
         utils
+        tester
 )
 
 foreach(SRC ${SRC_LIST})

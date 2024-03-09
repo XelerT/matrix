@@ -6,6 +6,7 @@ struct arguments_t
 {
         bool parsed = true;
         bool lvl1   = false;
+        bool lvl2   = false;
         bool multiply_mxes = false;
 
 };

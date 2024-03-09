@@ -108,6 +108,34 @@ namespace matrixes
                                 return *this;
                         }
 
+                        row_t& operator*=(const T &rhs_) {
+                                for (size_t i = 0; i < size; i++)
+                                        data[i] *= rhs_;
+
+                                return *this;
+                        }
+
+                        row_t& operator/=(const T &rhs_) {
+                                for (size_t i = 0; i < size; i++)
+                                        data[i] /= rhs_;
+
+                                return *this;
+                        }
+
+                        row_t& operator+=(const T &rhs_) {
+                                for (size_t i = 0; i < size; i++)
+                                        data[i] += rhs_;
+
+                                return *this;
+                        }
+
+                        row_t& operator-=(const T &rhs_) {
+                                for (size_t i = 0; i < size; i++)
+                                        data[i] -= rhs_;
+
+                                return *this;
+                        }
+
                         T& operator[] (size_t index_)
                         {
                                 if (index_ >= size)

@@ -6,9 +6,9 @@
 #include "chain.hpp"
 #include "ui.hpp"
 
-#include "alloc.hpp"
-
 #include "cmd_parser.hpp"
+
+#include "test_lazy.hpp"
 
 using namespace std;
 using namespace matrixes;
@@ -30,32 +30,36 @@ int main (int argc, const char *argv[])
                                             n_elems_data.second.begin(), 
                                             };
                 auto det_status = matrix.det();
+                cout << det_status.first << endl;
+        } else if (parsed_args.lvl2) {
+                if (parsed_args.multiply_mxes) {
+                        auto elems = get_matrixes();
+                        auto chain = create_matrix_chain(elems);
 
-                return 0;
+                        auto t1 = high_resolution_clock::now();
+                        auto ans_matrix = chain.optimal_mul();
+                        auto t2 = high_resolution_clock::now();
+
+                        duration<double, std::milli> delta_time = t2 - t1;        
+                        cout << "optimal_mul result: " << delta_time.count() <<  "ms\n";
+                        
+                        t1 = high_resolution_clock::now();        
+                        auto dummy_ans_matrix = chain.dummy_mul();
+                        t2 = high_resolution_clock::now();
+
+                        delta_time = t2 - t1;      
+                        cout << "dummy_mul result: " << delta_time.count() << " ms\n";
+                } else {
+                        auto n_elems_data = get_user_chain_data();
+                        matrix_chain_t<double> chain {};
+                        chain.print_optimal_sequence(n_elems_data.second);
+                }
+        } else { // lvl3
+                MEMORY_TRACKER.enable();
+                test_lazy_matrix(std::cout);
+                MEMORY_TRACKER.disable();
         }
 
-        if (parsed_args.multiply_mxes) {
-                auto elems = get_matrixes();
-                auto chain = create_matrix_chain(elems);
-
-                auto t1 = high_resolution_clock::now();
-                auto ans_matrix = chain.optimal_mul();
-                auto t2 = high_resolution_clock::now();
-
-                duration<double, std::milli> delta_time = t2 - t1;        
-                cout << "optimal_mul result: " << delta_time.count() <<  "ms\n";
-                
-                t1 = high_resolution_clock::now();        
-                auto dummy_ans_matrix = chain.dummy_mul();
-                t2 = high_resolution_clock::now();
-
-                delta_time = t2 - t1;      
-                cout << "dummy_mul result: " << delta_time.count() << " ms\n";
-        } else {
-                auto n_elems_data = get_user_chain_data();
-                matrix_chain_t<double> chain {};
-                chain.print_optimal_sequence(n_elems_data.second);
-        }
 
         return 0;
 }

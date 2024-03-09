@@ -1,47 +1,42 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 #include <string>
 #include <iostream>
 #include <unordered_map>
 
-class mem_obj_t 
-{
-        private:
-                std::vector<size_t> sizes {};
-        public:
-                void push_size (size_t size) { sizes.push_back(size); }
-
-                size_t& operator[] (size_t index) 
-                {
-                        if (index >= sizes.size())
-                                throw std::out_of_range("?");
-                        return sizes[index];
-                }
-};
-
 class mem_tracker_t 
 {
         private:
-                std::unordered_map<int, mem_obj_t> news    {};
-                std::unordered_map<int, mem_obj_t> deletes {};
+                std::unordered_map<size_t, size_t> news {};
+                size_t mem_alloced = 0;
 
                 bool enable_tracking = false;
 
         public:
-                void enable () { enable_tracking = true; }
+                void enable  () { enable_tracking = true; }
+                void disable () { enable_tracking = false; }
+                size_t get_mem_alloced () { return mem_alloced; }
 
                 void fixate_new (const void *ptr, size_t size)
                 {
-                        auto id = create_id(ptr);
-                        news.try_emplace(id);
-                        news[id].push_size(size);
+                        enable_tracking = false;
+
+                        auto id = calc_id(ptr);
+                        news[id] = size;
+                        mem_alloced += size;
+                        
+                        enable_tracking = true;
                 }
 
-                void fixate_delete (const void *ptr)
+                void fixate_delete (const void *ptr, size_t size)
                 {
-                        // deletes.
+                        enable_tracking = false;
+
+                        mem_alloced -= news[reinterpret_cast<size_t>(ptr)];
+                        news.erase(calc_id(ptr));
+                        
+                        enable_tracking = true;
                 }
 
                 void* tracked_new (size_t size)
@@ -50,10 +45,7 @@ class mem_tracker_t
 
                         if (enable_tracking) {
                                 ptr = malloc(size);
-
-                                enable_tracking = false;
                                 fixate_new(ptr, size);
-                                enable_tracking = true;
                         } else {
                                 ptr = malloc(size);
                         }
@@ -63,39 +55,55 @@ class mem_tracker_t
                         return ptr;
                 }
 
-                void tracked_delete (void *ptr)
+                void tracked_delete (void *ptr, size_t size = 0)
                 {
-                        if (enable_tracking)
-                                fixate_delete(ptr);
-
                         free(ptr);
+                        if (enable_tracking)
+                                fixate_delete(ptr, size);
                 }
 
-                int create_id (const void *ptr)
+                size_t calc_id (const void *ptr)
                 {
-                    // some hashfunc
-                    return 10;
+                    // maybe some hashfunc?
+                    return reinterpret_cast<size_t>(ptr);
+                }
+
+                void dump (const std::string &msg, std::ostream &os)
+                {
+                        os << msg << mem_alloced << std::endl;
                 }
 };
 
+// --------------------------------------- GLOBAL ---------------------------------------------------------------------
+
 inline mem_tracker_t MEMORY_TRACKER {};
 
-void* operator new (size_t size)
+inline void* operator new (size_t size)
 {
-    return MEMORY_TRACKER.tracked_new(size);
+        return MEMORY_TRACKER.tracked_new(size);
 }
 
-void* operator new[] (size_t size)
+inline void* operator new[] (size_t size)
 {
-    return MEMORY_TRACKER.tracked_new(size);
+        return MEMORY_TRACKER.tracked_new(size);
 }
 
-void operator delete(void* ptr)
+inline void operator delete (void* ptr)
 {
         MEMORY_TRACKER.tracked_delete(ptr);
 }
 
-void operator delete[](void* ptr)
+inline void operator delete[] (void* ptr)
 {
         MEMORY_TRACKER.tracked_delete(ptr);
+}
+
+inline void operator delete (void* ptr, size_t size)
+{
+        MEMORY_TRACKER.tracked_delete(ptr, size);
+}
+
+inline void operator delete[] (void* ptr, size_t size)
+{
+        MEMORY_TRACKER.tracked_delete(ptr, size);
 }
