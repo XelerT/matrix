@@ -60,6 +60,5 @@ int main (int argc, const char *argv[])
                 MEMORY_TRACKER.disable();
         }
 
-
         return 0;
 }

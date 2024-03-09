@@ -3,7 +3,6 @@
 ## Install & Build
 
         $ git clone https://github.com/XelerT/matrix.git
-        $ git checkout lvl2
         $ cd matrix
         $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build 
 
@@ -14,8 +13,12 @@ Run lvl1 mode:
 
 Run lvl2 mode:
 
-        $ ./matrix
+        $ ./matrix --lvl2=true
 
 Run chain multiplication comparison mode: 
 
-        $ ./matrix --mul=true
+        $ ./matrix --lvl2=true --mul=true
+
+Run tester of lazy matrixes
+
+        $ ./matrix
