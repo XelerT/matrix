@@ -126,6 +126,10 @@ namespace matrixes
                         void dump () const;
         };
 
+//===================================================~~~DECLARATIONS~~~====================================================================
+
+//---------------------------------------------------~~~~~~Public~~~~~~--------------------------------------------------------------------
+
         template <typename T>
         void matrix_t<T>::swap (size_t index1, size_t index2)
         {
@@ -163,6 +167,8 @@ namespace matrixes
                         std::cout << " ]\n";
                 }
         }
+
+//-------------------------------------------~~~~~~Binary Operators and Utils~~~~~~--------------------------------------------------------------------
 
         template <typename T>
         bool operator== (const matrix_t<T>& lhs, const matrix_t<T>& rhs) {

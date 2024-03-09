@@ -20,6 +20,8 @@ class imatrix_t
                 virtual ~imatrix_t () {}
 };
 
+//----------------------------------------------~~~~~~Utils~~~~~~----------------------------------------------------------------------------
+
 template <typename T, typename F>
 std::vector<row_t<T>*> perform_oper (const imatrix_t<T> *lhs, 
                                      const imatrix_t<T> *rhs, F oper) 

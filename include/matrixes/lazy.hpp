@@ -176,6 +176,10 @@ namespace matrixes
                                 }
         };
 
+//===================================================~~~DECLARATIONS~~~====================================================================
+
+//---------------------------------------------------~~~~~~Public~~~~~~--------------------------------------------------------------------
+
         template <typename T>
         void lazy_matrix_t<T>::swap (size_t index1, size_t index2)
         {
@@ -321,6 +325,8 @@ namespace matrixes
 
                 return *this;
         }
+
+//-------------------------------------------~~~~~~Binary Operators and Utils~~~~~~--------------------------------------------------------------------
 
         template <typename T>
         bool operator== (const lazy_matrix_t<T> &lhs, const lazy_matrix_t<T> &rhs) 
