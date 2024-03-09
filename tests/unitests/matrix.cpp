@@ -101,3 +101,19 @@ TEST (matrix, multiply_E)
         shared_ptr<matrix_t<int>> ans {static_cast<matrix_t<int>*>(matrix.mul(matrix_E))};
         ASSERT_TRUE(*ans == matrix);
 }
+
+TEST (matrix, sum_zero) 
+{
+        std::vector data {1, 0, 2, 
+                          0, 3, 0,
+                          4, 0, 5};
+        std::vector zero_data {0, 0, 0,
+                            0, 0, 0,
+                            0, 0, 0};
+
+        matrix_t<int> matrix {3, 3, data.begin()};
+        matrix_t<int> matrix_0 {3, 3, zero_data.begin()};
+
+        auto ans = matrix + matrix_0;
+        ASSERT_TRUE(ans == matrix);
+}

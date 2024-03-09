@@ -12,15 +12,14 @@ namespace matrixes
         class matrix_container_t
         {
                 protected:
-                        row_t<T>** rows;
+                        std::vector<row_t<T>*> rows;
                         size_t n_rows;
                         size_t n_cols;
 
                         matrix_container_t (size_t n_rows_, size_t n_cols_):
-                                rows(n_rows_ ? static_cast<row_t<T>**>(new row_t<T>* [n_rows_]) : nullptr),
-                                n_rows(n_rows_), n_cols(n_cols_)
+                                rows(n_rows_), n_rows(n_rows_), n_cols(n_cols_)
                         {
-                                for (size_t i = 0; i < n_rows_; i++) {
+                                for (size_t i = 0; i < n_rows; i++) {
                                         try {
                                                 rows[i] = static_cast<row_t<T>*>(::operator new(sizeof(row_t<T>)));
                                         } catch (std::bad_alloc &ba) {
@@ -28,7 +27,6 @@ namespace matrixes
                                                         --i;
                                                         ::operator delete(rows[i]);
                                                 }
-                                                delete [] rows;
                                                 n_rows = 0;
                                                 n_cols = 0;
                                                 throw std::bad_alloc();
@@ -36,14 +34,15 @@ namespace matrixes
                                 }
                         }
 
+                        matrix_container_t (std::vector<row_t<T>*> &&rows_):
+                                rows(rows_), n_rows(rows.size()), n_cols(rows[0]->get_size()) {}
+
                         ~matrix_container_t ()
                         {
                                 for (size_t i = 0; i < n_rows; i++) {
                                         destroy(rows[i]);
                                         ::operator delete(rows[i]);
                                 }
-                                if (n_rows)
-                                        delete [] rows;
                         }
 
                         matrix_container_t (matrix_container_t &rhs_) = delete;
@@ -52,7 +51,6 @@ namespace matrixes
                         matrix_container_t (matrix_container_t &&rhs_) noexcept :
                                 rows(rhs_.rows), n_rows(rhs_.n_rows), n_cols(rhs_.n_cols)
                         {
-                                rhs_.rows   = nullptr;
                                 rhs_.n_rows = 0;
                                 rhs_.n_cols = 0;
                         }
@@ -85,6 +83,9 @@ namespace matrixes
                                         begin_ += n_cols;
                                 }
                         }
+
+                        matrix_t (std::vector<row_t<T>*> &&rows_):
+                                matrix_container_t<T>{std::move(rows_)} {}
 
                         matrix_t (matrix_t &&rhs) = default;
                         matrix_t& operator=(matrix_t &&rhs) = default;
@@ -176,5 +177,27 @@ namespace matrixes
                                         if (lhs[i][j] != rhs[i][j])
                                                 return false;
                 return res;
+        }
+
+        template <typename T, typename F>
+        matrix_t<T> perform_oper (const matrix_t<T> &lhs, 
+                                  const matrix_t<T> &rhs, F oper) 
+        {
+                auto new_rows = perform_oper(reinterpret_cast<const imatrix_t<T>*>(&lhs), 
+                                             reinterpret_cast<const imatrix_t<T>*>(&rhs),
+                                             oper);
+                return matrix_t<T>{std::move(new_rows)};
+        }
+
+        template <typename T>
+        matrix_t<T> operator+ (const matrix_t<T> &lhs, const matrix_t<T> &rhs) 
+        {
+                return perform_oper(lhs, rhs, [] (T l, T r) { return l + r; });
+        }
+
+        template <typename T>
+        matrix_t<T> operator- (const matrix_t<T> &lhs, const matrix_t<T> &rhs) 
+        {
+                return perform_oper(lhs, rhs, [] (T l, T r) { return l - r; });
         }
 }
