@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <iostream>
 
 int length (int number, int base = 10);
 

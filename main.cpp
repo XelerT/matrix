@@ -6,6 +6,8 @@
 #include "chain.hpp"
 #include "ui.hpp"
 
+#include "alloc.hpp"
+
 #include "cmd_parser.hpp"
 
 using namespace std;

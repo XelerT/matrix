@@ -1,11 +1,13 @@
 #include "config.hpp"
 
 #include "lazy.hpp"
+#include "alloc.hpp"
 
 using namespace matrixes;
 
 TEST (lazy_matrix, init)
 {
+        MEMORY_TRACKER.enable();
         std::vector data {1, 2, 3, 4};
 
         lazy_matrix_t<int> matrix {2, 2, data.begin()};

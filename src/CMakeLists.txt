@@ -1,6 +1,7 @@
 set(SRC_LIST
         matrixes
         ui
+        utils
 )
 
 foreach(SRC ${SRC_LIST})
