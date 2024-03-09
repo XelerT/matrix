@@ -20,4 +20,31 @@ class imatrix_t
                 virtual ~imatrix_t () {}
 };
 
+template <typename T, typename F>
+std::vector<row_t<T>*> perform_oper (const imatrix_t<T> *lhs, 
+                                     const imatrix_t<T> *rhs, F oper) 
+{
+
+        auto lhs_n_rows = lhs->get_n_rows();
+        auto lhs_n_cols = lhs->get_n_cols();
+        std::vector<row_t<T>*> new_rows {};
+        
+        bool res = lhs_n_rows == rhs->get_n_rows() && lhs_n_cols == rhs->get_n_cols();
+        if (res) {
+                for (size_t i = 0; i < lhs_n_rows; i++) {
+                        try {
+                                auto row = perform_oper((*lhs)[i], (*rhs)[i], oper);
+                                new_rows.push_back(row);
+                        } catch (...) {
+                                for (auto& row : new_rows)
+                                        delete row;
+                                throw;
+                        }
+                } 
+        } else {
+                throw std::out_of_range("Lazy matrixes with different sizes.");
+        }
+        return new_rows; 
+}
+
 }

@@ -31,4 +31,14 @@ void test_lazy_matrix (std::ostream &os)
         MEMORY_TRACKER.dump("Allocated memory before int multiply: ", os);
         copied_matrix2 *= 0;
         MEMORY_TRACKER.dump("Allocated memory after int multiply: ", os);
+
+
+        auto copied_matrix3 = matrix;
+        MEMORY_TRACKER.dump("Copied_matrix3 and matrix share a common buffer--> ", os);
+        copied_matrix1 = copied_matrix3;
+        MEMORY_TRACKER.dump("the old buffer copied_matrix1 is freed; matrix," \
+                            "Copied_matrix3 and copied_matrix1 share the common one--> ", os);
+        matrix += matrix2;
+        MEMORY_TRACKER.dump("now matrix has a new buffer, copied_matrix1 and " \
+                            "copied_matrix3 share a common buffer that used to be matrix's buffer--> ", os);
 }

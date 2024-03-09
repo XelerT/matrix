@@ -186,18 +186,30 @@ namespace matrixes
         }
 
         template <typename T>
-        row_t<T> operator+(const row_t<T> &rhs_, const row_t<T> &lhs_)
+        row_t<T> operator+(const row_t<T> &lhs_, const row_t<T> &rhs_)
         {
-                row_t tmp(rhs_);
-                tmp += lhs_;
+                row_t tmp(lhs_);
+                tmp += rhs_;
                 return tmp;
         }
 
         template <typename T>
-        row_t<T> operator-(const row_t<T> &rhs_, const row_t<T> &lhs_)
+        row_t<T> operator-(const row_t<T> &lhs_, const row_t<T> &rhs_)
         {
-                row_t tmp(rhs_);
-                tmp -= lhs_;
+                row_t tmp(lhs_);
+                tmp -= rhs_;
                 return tmp;
+        }
+
+        template <typename T, typename F>
+        row_t<T>* perform_oper (const row_t<T> &lhs_, const row_t<T> &rhs_, F oper)
+        {
+                auto size = lhs_.get_size();
+                row_t<T> *row = new row_t<T>{size};
+                
+                for (size_t i = 0; i < size; i++)
+                        row->insert(oper(lhs_[i], rhs_[i]));
+                
+                return row;
         }
 }

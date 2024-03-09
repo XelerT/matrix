@@ -37,6 +37,9 @@ namespace matrixes
                                 linked_with = 1;
                         }
 
+                        lazy_matrix_container_t (std::vector<row_t<T>*> &&rows_):
+                                rows(rows_), n_rows(rows.size()), n_cols(rows[0]->get_size()) {}
+
                         ~lazy_matrix_container_t ()
                         {
                                 for (size_t i = 0; i < n_rows; i++) {
@@ -101,6 +104,9 @@ namespace matrixes
                                         begin_ += n_cols_;
                                 }
                         }
+
+                        lazy_matrix_t (std::vector<row_t<T>*> &&rows_):
+                                container(new lazy_matrix_container_t<T>{std::move(rows_)}) {}
 
                         lazy_matrix_t (lazy_matrix_t &&rhs) = default;
                         lazy_matrix_t& operator=(lazy_matrix_t &&rhs) = default;
@@ -222,8 +228,8 @@ namespace matrixes
         template <typename T>
         lazy_matrix_t<T>& lazy_matrix_t<T>::operator*= (lazy_matrix_t &rhs)
         {
-                auto n_cols = container->get_n_cols(); 
                 check_sizes(rhs);
+                auto n_cols = container->get_n_cols(); 
 
                 if (container->get_linked_with() > 1) {
                         std::vector<T> new_elems = mul_container(rhs);
@@ -317,7 +323,8 @@ namespace matrixes
         }
 
         template <typename T>
-        bool operator== (const lazy_matrix_t<T>& lhs, const lazy_matrix_t<T>& rhs) {
+        bool operator== (const lazy_matrix_t<T> &lhs, const lazy_matrix_t<T> &rhs) 
+        {
                 auto lhs_n_rows = lhs.get_n_rows();
                 auto lhs_n_cols = lhs.get_n_cols();
         
@@ -328,5 +335,27 @@ namespace matrixes
                                         if (lhs[i][j] != rhs[i][j])
                                                 return false;
                 return res;
+        }
+
+        template <typename T, typename F>
+        lazy_matrix_t<T> perform_oper (const lazy_matrix_t<T> &lhs, 
+                                       const lazy_matrix_t<T> &rhs, F oper) 
+        {
+                auto new_rows = perform_oper(reinterpret_cast<const imatrix_t<T>*>(&lhs), 
+                                             reinterpret_cast<const imatrix_t<T>*>(&rhs),
+                                             oper);
+                return lazy_matrix_t<T>{std::move(new_rows)};
+        }
+
+        template <typename T>
+        lazy_matrix_t<T> operator+ (const lazy_matrix_t<T> &lhs, const lazy_matrix_t<T> &rhs) 
+        {
+                return perform_oper(lhs, rhs, [] (T l, T r) { return l + r; });
+        }
+
+        template <typename T>
+        lazy_matrix_t<T> operator- (const lazy_matrix_t<T> &lhs, const lazy_matrix_t<T> &rhs) 
+        {
+                return perform_oper(lhs, rhs, [] (T l, T r) { return l - r; });
         }
 }
