@@ -104,24 +104,24 @@ namespace matrixes
                                 return *this;
                         }
 
-                        row_t<T>& operator[] (size_t n_row_)
+                        row_t<T>& operator[] (size_t n_row_) override
                         {
                                 if (n_row_ >= n_rows)
                                         throw std::out_of_range("Wrong number of row.");
                                 return *rows[n_row_];
                         }
 
-                        const row_t<T>& operator[] (size_t n_row_) const
+                        const row_t<T>& operator[] (size_t n_row_) const override
                         { 
                                 if (n_row_ >= n_rows)
                                         throw std::out_of_range("Wrong number of row.");
                                 return *rows[n_row_];
                         }
 
-                        size_t get_n_cols () const { return n_cols; }
-                        size_t get_n_rows () const { return n_rows; }
+                        size_t get_n_cols () const override { return n_cols; }
+                        size_t get_n_rows () const override { return n_rows; }
                         void swap (size_t index1, size_t index2);
-                        imatrix_t<T>* mul (imatrix_t<T> &rhs_) const;
+                        imatrix_t<T>* mul (imatrix_t<T> &rhs_) const override;
 
                         void dump () const;
         };

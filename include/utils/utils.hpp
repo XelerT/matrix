@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <random>
 
 enum class status_t
 {
@@ -32,4 +33,13 @@ template <typename It> void destroy (It begin, It end)
                 destroy(begin);
                 begin++;
         }
+}
+
+template <typename T> T get_random_num ()
+{
+        std::random_device rd;
+        std::mt19937_64 gen(rd());
+        std::uniform_int_distribution<T> dis;
+        
+        return dis(gen) % 10;
 }

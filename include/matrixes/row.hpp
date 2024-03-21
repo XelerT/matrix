@@ -164,6 +164,8 @@ namespace matrixes
                         void swap (size_t index1, size_t index2);
 
                         void dump () const;
+
+                        static row_t<T> gen_random (size_t size);
         };
 
 //===================================================~~~DECLARATIONS~~~====================================================================
@@ -183,6 +185,17 @@ namespace matrixes
         { 
                 for (size_t i = 0; i < size; i++)
                         std::cout << data[i] << " ";
+        }
+
+        template <typename T>
+        row_t<T> row_t<T>::gen_random (size_t size)
+        {
+                std::vector<T> elems {};
+                elems.reserve(size);
+                for (size_t i = 0; i < size; i++)
+                        elems.push_back(get_random_num<T>());
+
+                return row_t<T>(elems.begin(), elems.end());
         }
 
         template <typename T>
