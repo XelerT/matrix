@@ -122,6 +122,11 @@ namespace matrixes
                         size_t get_n_rows () const override { return n_rows; }
                         void swap (size_t index1, size_t index2);
                         imatrix_t<T>* mul (imatrix_t<T> &rhs_) const override;
+                        row_t<T> mul (row_t<T> &rhs_) const override;
+
+                        static matrix_t<T> gen_random (size_t n_rows, size_t n_cols);
+                        row_t<T> power_iteration (int n_iters) const;
+
 
                         void dump () const;
         };
@@ -157,6 +162,55 @@ namespace matrixes
 
                 return new matrix_t {n_rows, static_cast<matrix_t<T>&>(rhs_).n_cols, new_elems.begin()};
         }
+
+        template <typename T>
+        row_t<T> matrix_t<T>::mul (row_t<T> &rhs_) const
+        {
+                auto n_rows = get_n_rows();
+                if (n_rows != rhs_.get_size())
+                        throw std::out_of_range("Wrong matrix and row dimensions.");
+                        
+                std::vector<T> new_elems {};
+                auto n_cols = get_n_cols();
+                for (size_t i = 0; i < n_rows; i++) {
+                        T temp {};
+                        for (size_t j = 0; j < n_cols; j++)
+                                temp += (*this)[i][j] * rhs_[j];                                
+                        new_elems.push_back(temp);
+                }
+
+                return row_t<T> {new_elems.begin(), new_elems.end()};
+        }
+
+        template <typename T> matrix_t<T> 
+        matrix_t<T>::gen_random (size_t n_rows, size_t n_cols)
+        {
+                std::vector<row_t<T>*> rows {};
+                rows.reserve(n_rows);
+                try {
+                        for (size_t i = 0; i < n_rows; i++)
+                                rows.push_back(new row_t<T> {row_t<T>::gen_random(n_cols)});
+                } catch (...) {
+                        for (auto&& row : rows)
+                                delete row;
+                        throw;
+                }
+
+                return matrix_t<T> {std::move(rows)};
+        }
+
+        template <typename T>
+        row_t<T> matrix_t<T>::power_iteration (int n_iters) const
+        {
+                auto b_k = row_t<T>::gen_random(get_n_cols());
+
+                for (int i = 0; i < n_iters; i++) {
+                        auto b_k1 = this->mul(b_k);
+                        b_k = b_k1 / b_k1.module();
+                }
+                return b_k;
+        }
+
 
         template <typename T>
         void matrix_t<T>::dump () const

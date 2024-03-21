@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <stdexcept>
+#include <cmath>
 
 #include "utils/std_vector.hpp"
 #include "utils/utils.hpp"
@@ -117,7 +118,8 @@ namespace matrixes
 
                         row_t& operator/=(const T &rhs_) {
                                 for (size_t i = 0; i < size; i++)
-                                        data[i] /= rhs_;
+                                        if (rhs_)
+                                                data[i] /= rhs_;
 
                                 return *this;
                         }
@@ -160,6 +162,14 @@ namespace matrixes
                                 }
                         }
 
+                        T module () const // need to replace with dot product?
+                        { 
+                                T sum {};
+                                for (size_t i = 0; i < size; i++)
+                                        sum += data[i] * data[i];
+                                return std::sqrt(sum);
+                        }
+
                         size_t get_size () const { return size; }
                         void swap (size_t index1, size_t index2);
 
@@ -196,6 +206,14 @@ namespace matrixes
                         elems.push_back(get_random_num<T>());
 
                 return row_t<T>(elems.begin(), elems.end());
+        }
+
+        template <typename T>
+        row_t<T> operator/(const row_t<T> &lhs_, const T &rhs_)
+        {
+                row_t tmp(lhs_);
+                tmp /= rhs_;
+                return tmp;
         }
 
         template <typename T>

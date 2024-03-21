@@ -145,7 +145,8 @@ namespace matrixes
                         int    get_linked_with () const { return container->get_linked_with(); }
                         void swap (size_t index1, size_t index2);
                         std::vector<T> mul_container (imatrix_t<T> &rhs_) const;
-                        imatrix_t<T>*  mul (imatrix_t<T> &rhs_) const override;
+                        imatrix_t<T>* mul (imatrix_t<T> &rhs_) const override;
+                        row_t<T> mul (row_t<T> &rhs_) const override;
 
                         static lazy_matrix_t<T> gen_random (size_t n_rows, size_t n_cols);
 
@@ -238,6 +239,25 @@ imatrix_t<T>* lazy_matrix_t<T>::mul (imatrix_t<T> &rhs_) const
         std::vector<T> new_elems = mul_container(rhs_);
 
         return new lazy_matrix_t {get_n_rows(), static_cast<imatrix_t<T>&>(rhs_).get_n_cols(), new_elems.begin()};
+}
+
+template <typename T>
+row_t<T> lazy_matrix_t<T>::mul (row_t<T> &rhs_) const
+{
+        auto n_rows = get_n_rows();
+        if (n_rows != rhs_.get_size())
+                throw std::out_of_range("Wrong matrix and row dimensions.");
+                
+        std::vector<T> new_elems {};
+        auto n_cols = get_n_cols();
+        for (size_t i = 0; i < n_rows; i++) {
+                T temp {};
+                for (size_t j = 0; j < n_cols; j++)
+                        temp += (*this)[i][j] * rhs_[j];                                
+                new_elems.push_back(temp);
+        }
+
+        return row_t<T> {new_elems.begin(), new_elems.end()};
 }
 
 template <typename T>
@@ -351,10 +371,10 @@ lazy_matrix_t<T>& lazy_matrix_t<T>::operator-= (const T &rhs)
 template <typename T>
 row_t<T> lazy_matrix_t<T>::power_iteration (int n_iters) const
 {
-        auto b_k = row_t<T>::get_random(get_n_cols());
+        auto b_k = row_t<T>::gen_random(get_n_cols());
 
         for (int i = 0; i < n_iters; i++) {
-                auto b_k1 = *this * b_k;
+                auto b_k1 = this->mul(b_k);
                 b_k = b_k1 / b_k1.module();
         }
         return b_k;

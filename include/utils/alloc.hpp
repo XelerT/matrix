@@ -4,12 +4,14 @@
 #include <string>
 #include <iostream>
 #include <unordered_map>
+#include <utility>
 
 class mem_tracker_t 
 {
         private:
                 std::unordered_map<size_t, size_t> news {};
                 size_t mem_alloced = 0;
+                size_t mem_used = 0;
 
                 bool enable_tracking = false;
 
@@ -17,6 +19,9 @@ class mem_tracker_t
                 void enable  () { enable_tracking = true; }
                 void disable () { enable_tracking = false; }
                 size_t get_mem_alloced () { return mem_alloced; }
+                size_t get_used_mem () { return mem_used; }
+
+                size_t reset_used_mem_cnt () { return std::exchange(mem_used, 0); }
 
                 void fixate_new (const void *ptr, size_t size)
                 {
@@ -25,6 +30,7 @@ class mem_tracker_t
                         auto id = calc_id(ptr);
                         news[id] = size;
                         mem_alloced += size;
+                        mem_used += size;
                         
                         enable_tracking = true;
                 }
@@ -68,9 +74,11 @@ class mem_tracker_t
                     return reinterpret_cast<size_t>(ptr);
                 }
 
-                void dump (const std::string &msg, std::ostream &os)
+                void dump (std::ostream &os, const std::string &msg = "")
                 {
-                        os << msg << mem_alloced << std::endl;
+                        os << msg                                 << std::endl;
+                        os << "Allocated memory: " << mem_alloced << std::endl;
+                        os << "Used memory: "      << mem_used    << std::endl;
                 }
 };
 
