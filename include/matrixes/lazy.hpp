@@ -146,6 +146,7 @@ namespace matrixes
                         void swap (size_t index1, size_t index2);
                         std::vector<T> mul_container (imatrix_t<T> &rhs_) const;
                         imatrix_t<T>* mul (imatrix_t<T> &rhs_) const override;
+                        imatrix_t<T>* power_zero () const override;
                         row_t<T> mul (row_t<T> &rhs_) const override;
 
                         static lazy_matrix_t<T> gen_random (size_t n_rows, size_t n_cols);
@@ -238,7 +239,21 @@ imatrix_t<T>* lazy_matrix_t<T>::mul (imatrix_t<T> &rhs_) const
 {
         std::vector<T> new_elems = mul_container(rhs_);
 
-        return new lazy_matrix_t {get_n_rows(), static_cast<imatrix_t<T>&>(rhs_).get_n_cols(), new_elems.begin()};
+        return new lazy_matrix_t {get_n_rows(), rhs_.get_n_cols(), new_elems.begin()};
+}
+
+template <typename T>
+imatrix_t<T>* lazy_matrix_t<T>::power_zero () const
+{
+        size_t n_cols = get_n_cols();
+        size_t n_rows = get_n_rows();
+        size_t n_elems = n_cols * n_rows;
+        
+        std::vector<T> elems (n_elems);
+        for (size_t i = 0; i < n_elems; i += 1 + n_cols)
+                elems[i] = 1;
+
+        return new lazy_matrix_t {n_rows, n_rows, elems.begin()};
 }
 
 template <typename T>
