@@ -168,17 +168,17 @@ namespace matrixes
                 return new matrix_t {n_rows, rhs_.get_n_cols(), new_elems.begin()};
         }
 
-template <typename T>
-imatrix_t<T>* matrix_t<T>::power_zero () const
-{
-        size_t n_elems = n_cols * n_rows;
-        
-        std::vector<T> elems (n_elems);
-        for (size_t i = 0; i < n_elems; i += 1 + n_cols)
-                elems[i] = 1;
+        template <typename T>
+        imatrix_t<T>* matrix_t<T>::power_zero () const
+        {
+                size_t n_elems = n_cols * n_rows;
+                
+                std::vector<T> elems (n_elems);
+                for (size_t i = 0; i < n_elems; i += 1 + n_cols)
+                        elems[i] = 1;
 
-        return new matrix_t {n_rows, n_rows, elems.begin()};
-}
+                return new matrix_t {n_rows, n_rows, elems.begin()};
+        }
 
         template <typename T>
         row_t<T> matrix_t<T>::mul (row_t<T> &rhs_) const

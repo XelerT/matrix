@@ -79,15 +79,35 @@ namespace matrixes
                         size_t get_n_cols () const  { return n_cols; }
                         size_t get_n_rows () const  { return n_rows; }
 
-                        row_t<T>* operator[] (size_t i) { return rows[i]; }
+                        row_t<T>& operator[] (size_t i) { return *rows[i]; }
+                        const row_t<T>& operator[] (size_t i) const { return *rows[i]; }
 
                         lazy_matrix_container_t* clone ()
                         {
                                 auto temp = new lazy_matrix_container_t<T> {n_rows, n_cols};
                                 for (size_t i = 0; i < n_rows; i++)
-                                        construct((*temp)[i], *rows[i]);
+                                        construct(&(*temp)[i], *rows[i]);
                                 
                                 return temp;
+                        }
+
+                        std::vector<T> mul (std::shared_ptr<lazy_matrix_container_t<T>> &rhs_) const
+                        {
+                                if (n_cols != rhs_->get_n_rows())
+                                        throw std::out_of_range("Wrong matrixes dimensions.");
+                                        
+                                std::vector<T> new_elems {};
+                                for (size_t i = 0; i < n_rows; i++) {
+                                        auto n_cols_ = rhs_->get_n_cols();
+                                        for (size_t k = 0; k < n_cols_; k++) {
+                                                T temp {};
+                                                for (size_t j = 0; j < n_cols; j++) {
+                                                        temp += (*this)[i][j] * (*rhs_)[j][k];                                
+                                                }
+                                                new_elems.push_back(temp);
+                                        }
+                                }
+                                return new_elems;
                         }
         };
 
@@ -102,7 +122,7 @@ namespace matrixes
                                 container(new lazy_matrix_container_t<T>{n_rows_, n_cols_}) 
                         {
                                 for (size_t i = 0; i < n_rows_; i++) {
-                                        construct((*container)[i], std::move(row_t<T>(begin_, begin_ + n_cols_)));
+                                        construct(&(*container)[i], std::move(row_t<T>(begin_, begin_ + n_cols_)));
                                         begin_ += n_cols_;
                                 }
                         }
@@ -134,21 +154,21 @@ namespace matrixes
                         {
                                 if (n_row_ >= get_n_rows())
                                         throw std::out_of_range("Wrong number of row.");
-                                return *(*container)[n_row_];
+                                return (*container)[n_row_];
                         }
 
                         const row_t<T>& operator[] (size_t n_row_) const
                         {
                                 if (n_row_ >= get_n_rows())
                                         throw std::out_of_range("Wrong number of row.");
-                                return *(*container)[n_row_];
+                                return (*container)[n_row_];
                         }
 
                         size_t get_n_cols () const override { return container->get_n_cols(); }
                         size_t get_n_rows () const override { return container->get_n_rows(); }
                         int    get_linked_with () const { return container->get_linked_with(); }
                         void swap (size_t index1, size_t index2);
-                        std::vector<T> mul_container (imatrix_t<T> &rhs_) const;
+                        std::vector<T> mul_container (lazy_matrix_t<T> &rhs_) const;
                         imatrix_t<T>* mul (imatrix_t<T> &rhs_) const override;
                         imatrix_t<T>* power_zero () const override;
                         row_t<T> mul (row_t<T> &rhs_) const override;
@@ -216,33 +236,11 @@ void lazy_matrix_t<T>::swap (size_t index1, size_t index2)
         container[index1] = container[index2];
         container[index2] = temp; 
 }
-
-template <typename T>
-std::vector<T> lazy_matrix_t<T>::mul_container (imatrix_t<T> &rhs_) const
-{
-        auto n_cols = container->get_n_cols(); 
-        if (n_cols != static_cast<lazy_matrix_t<T>&>(rhs_).get_n_rows())
-                throw std::out_of_range("Wrong matrixes dimensions.");
-                
-        std::vector<T> new_elems {};
-        auto n_rows = container->get_n_rows();
-        for (size_t i = 0; i < n_rows; i++) {
-                auto n_cols_ = static_cast<lazy_matrix_t<T>&>(rhs_).get_n_cols();
-                for (size_t k = 0; k < n_cols_; k++) {
-                        T temp {};
-                        for (size_t j = 0; j < n_cols; j++) {
-                                temp += (*this)[i][j] * (static_cast<lazy_matrix_t<T>&>(rhs_))[j][k];                                
-                        }
-                        new_elems.push_back(temp);
-                }
-        }
-        return new_elems;
-}
         
 template <typename T>
 imatrix_t<T>* lazy_matrix_t<T>::mul (imatrix_t<T> &rhs_) const
 {
-        std::vector<T> new_elems = mul_container(rhs_);
+        std::vector<T> new_elems = container->mul(static_cast<lazy_matrix_t<T>&>(rhs_).container);
 
         return new lazy_matrix_t {get_n_rows(), rhs_.get_n_cols(), new_elems.begin()};
 }
@@ -298,14 +296,14 @@ lazy_matrix_t<T>& lazy_matrix_t<T>::operator*= (lazy_matrix_t &rhs)
         auto n_cols = container->get_n_cols(); 
 
         if (container->get_linked_with() > 1) {
-                std::vector<T> new_elems = mul_container(rhs);
+                std::vector<T> new_elems = container->mul(rhs.container);
                 auto prev_container = container;
                 container.reset(new lazy_matrix_container_t<T> {get_n_rows(), n_cols});
                         
                 auto elems_it = new_elems.begin();
                 auto n_rows = get_n_rows();
                 for (size_t i = 0; i < n_rows; i++) {
-                        construct((*container)[i], std::move(row_t<T>(elems_it, elems_it + n_cols)));
+                        construct(&(*container)[i], std::move(row_t<T>(elems_it, elems_it + n_cols)));
                         elems_it += n_cols;
                 }
                 prev_container->dec_linked_with();
@@ -322,7 +320,7 @@ lazy_matrix_t<T>& lazy_matrix_t<T>::operator+= (const lazy_matrix_t &rhs)
                                 
         size_t n_rows = get_n_rows();
         for (size_t i = 0; i < n_rows; i++)
-                *(*container)[i] += rhs[i];
+                (*container)[i] += rhs[i];
 
         return *this;
 }
@@ -347,7 +345,7 @@ lazy_matrix_t<T>& lazy_matrix_t<T>::operator*= (const T &rhs)
                                 
         size_t n_rows = get_n_rows();
         for (size_t i = 0; i < n_rows; i++)
-                *(*container)[i] *= rhs;
+                (*container)[i] *= rhs;
 
         return *this;
 }

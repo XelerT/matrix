@@ -29,7 +29,7 @@ class imatrix_t
 //----------------------------------------------~~~~~~Utils~~~~~~----------------------------------------------------------------------------
 
 template <typename T> std::unique_ptr<imatrix_t<T>>
-power (const std::unique_ptr<imatrix_t<T>> &mtx, int n)
+power (const imatrix_t<T> *mtx, int n)
 {
         using imtrx_uptr = std::unique_ptr<imatrix_t<T>>;
         std::vector<imatrix_t<T>*> matrixes {mtx->clone()};
@@ -52,7 +52,7 @@ power (const std::unique_ptr<imatrix_t<T>> &mtx, int n)
 }
 
 template <typename T> std::unique_ptr<imatrix_t<T>>
-rec_power (const std::unique_ptr<imatrix_t<T>> &mtx, int n)
+rec_power (const imatrix_t<T> *mtx, int n)
 {
         using imtrx_uptr = std::unique_ptr<imatrix_t<T>>;
         if (!n)

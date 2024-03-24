@@ -55,9 +55,9 @@ int main (int argc, const char *argv[])
                         chain.print_optimal_sequence(n_elems_data.second);
                 }
         } else { // lvl3
-                MEMORY_TRACKER.enable();
+                TESTER.enable_mem_tracker();
                 test_lazy_matrix(std::cout);
-                MEMORY_TRACKER.disable();
+                TESTER.disable_mem_tracker();
         }
 
         return 0;
