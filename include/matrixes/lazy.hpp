@@ -18,7 +18,7 @@ namespace matrixes
                         int linked_with;
                 public:
                         lazy_matrix_container_t (size_t n_rows_, size_t n_cols_):
-                                rows(n_rows_), n_rows(n_rows_), n_cols(n_cols_)
+                                rows(n_rows_), n_rows(n_rows_), n_cols(n_cols_), linked_with(1)
                         {
                                 for (size_t i = 0; i < n_rows; i++) {
                                         try {
@@ -33,8 +33,6 @@ namespace matrixes
                                                 throw std::bad_alloc();
                                         }
                                 }
-
-                                linked_with = 1;
                         }
 
                         lazy_matrix_container_t (std::vector<row_t<T>*> &&rows_):
@@ -42,9 +40,13 @@ namespace matrixes
 
                         ~lazy_matrix_container_t ()
                         {
-                                for (size_t i = 0; i < n_rows; i++) {
-                                        destroy(rows[i]);
-                                        ::operator delete(rows[i]);
+                                if (linked_with > 1) {
+                                        linked_with--;
+                                } else {
+                                        for (size_t i = 0; i < n_rows; i++) {
+                                                destroy(rows[i]);
+                                                ::operator delete(rows[i]);
+                                        }
                                 }
                         }
 
@@ -111,7 +113,9 @@ namespace matrixes
                         lazy_matrix_t (lazy_matrix_t &&rhs) = default;
                         lazy_matrix_t& operator=(lazy_matrix_t &&rhs) = default;
 
-                        lazy_matrix_t (lazy_matrix_t &rhs):
+                        virtual ~lazy_matrix_t () = default;
+
+                        lazy_matrix_t (const lazy_matrix_t &rhs):
                                 container(rhs.container)
                         {
                                 container->inc_linked_with();
@@ -152,6 +156,7 @@ namespace matrixes
                         static lazy_matrix_t<T> gen_random (size_t n_rows, size_t n_cols);
 
                         lazy_matrix_container_t<T>* clone_container () const { return container->clone(); }
+                        imatrix_t<T>* clone () const { return new lazy_matrix_t<T> {*this}; }
 
                         void dump () const;
 
@@ -259,12 +264,12 @@ imatrix_t<T>* lazy_matrix_t<T>::power_zero () const
 template <typename T>
 row_t<T> lazy_matrix_t<T>::mul (row_t<T> &rhs_) const
 {
-        auto n_rows = get_n_rows();
-        if (n_rows != rhs_.get_size())
+        auto n_cols = get_n_cols();
+        if (n_cols != rhs_.get_size())
                 throw std::out_of_range("Wrong matrix and row dimensions.");
                 
         std::vector<T> new_elems {};
-        auto n_cols = get_n_cols();
+        auto n_rows = get_n_rows();
         for (size_t i = 0; i < n_rows; i++) {
                 T temp {};
                 for (size_t j = 0; j < n_cols; j++)
@@ -278,7 +283,7 @@ row_t<T> lazy_matrix_t<T>::mul (row_t<T> &rhs_) const
 template <typename T>
 void lazy_matrix_t<T>::dump () const
 {
-        auto n_rows = container->get_n_rows();
+        auto n_rows = get_n_rows();
         for (size_t i = 0; i < n_rows; i++) {
                 std::cout << "[ ";
                 (*container)[i]->dump();

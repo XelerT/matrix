@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+#include <iostream>
 #include "row.hpp"
 
 namespace matrixes
@@ -13,6 +15,7 @@ class imatrix_t
                 virtual row_t<T>      mul (row_t<T> &rhs_)     const = 0;
 
                 virtual imatrix_t<T>* power_zero () const = 0;
+                virtual imatrix_t<T>* clone () const = 0;
                         
                 virtual size_t get_n_cols () const = 0;
                 virtual size_t get_n_rows () const = 0;
@@ -25,19 +28,43 @@ class imatrix_t
 
 //----------------------------------------------~~~~~~Utils~~~~~~----------------------------------------------------------------------------
 
-template <typename T>
-imatrix_t<T>* power (const imatrix_t<T> *mtx, int n)
+template <typename T> std::unique_ptr<imatrix_t<T>>
+power (const std::unique_ptr<imatrix_t<T>> &mtx, int n)
 {
-        if (!n)
-                return mtx->power_zero();
+        using imtrx_uptr = std::unique_ptr<imatrix_t<T>>;
+        std::vector<imatrix_t<T>*> matrixes {mtx->clone()};
 
-        imatrix_t<T> *x = power(mtx, n / 2);
-        imatrix_t<T> *y = x->mul(*x);
+        for (int i = n, size = 0; i > 1; i /= 2, size++) {
+                auto temp = matrixes[size]->mul(*matrixes[size]);
+                if (i % 2) {
+                        matrixes.push_back(mtx->mul(*temp));
+                        delete temp;
+                } else {
+                        matrixes.push_back(temp);
+                }
+        }
+
+        auto last_mtx_it = matrixes.end() - 1;
+        for (auto it = matrixes.begin(); it != last_mtx_it; ++it) {
+                delete *it;
+        }
+        return imtrx_uptr {*last_mtx_it};
+}
+
+template <typename T> std::unique_ptr<imatrix_t<T>>
+rec_power (const std::unique_ptr<imatrix_t<T>> &mtx, int n)
+{
+        using imtrx_uptr = std::unique_ptr<imatrix_t<T>>;
+        if (!n)
+                return imtrx_uptr {mtx->power_zero()};
+
+        imtrx_uptr x {power(mtx, n / 2)};
+        imtrx_uptr y {x->mul(*x)};
 
         if (n % 2)
-                return mtx->mul(*y);
+                return imtrx_uptr {mtx->mul(*y)};
         else
-                return x->mul(*x);
+                return imtrx_uptr {x->mul(*x)};
 }
 
 template <typename T, typename F>

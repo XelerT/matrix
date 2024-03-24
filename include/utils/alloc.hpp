@@ -35,7 +35,7 @@ class mem_tracker_t
                         enable_tracking = true;
                 }
 
-                void fixate_delete (const void *ptr, size_t size)
+                void fixate_delete (const void *ptr)
                 {
                         enable_tracking = false;
 
@@ -61,11 +61,11 @@ class mem_tracker_t
                         return ptr;
                 }
 
-                void tracked_delete (void *ptr, size_t size = 0)
+                void tracked_delete (void *ptr)
                 {
                         free(ptr);
                         if (enable_tracking)
-                                fixate_delete(ptr, size);
+                                fixate_delete(ptr);
                 }
 
                 size_t calc_id (const void *ptr)
@@ -108,10 +108,10 @@ inline void operator delete[] (void* ptr)
 
 inline void operator delete (void* ptr, size_t size)
 {
-        MEMORY_TRACKER.tracked_delete(ptr, size);
+        MEMORY_TRACKER.tracked_delete(ptr);
 }
 
 inline void operator delete[] (void* ptr, size_t size)
 {
-        MEMORY_TRACKER.tracked_delete(ptr, size);
+        MEMORY_TRACKER.tracked_delete(ptr);
 }

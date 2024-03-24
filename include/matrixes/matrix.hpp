@@ -90,12 +90,14 @@ namespace matrixes
                         matrix_t (matrix_t &&rhs) = default;
                         matrix_t& operator=(matrix_t &&rhs) = default;
 
-                        matrix_t (matrix_t &rhs_):
+                        matrix_t (const matrix_t &rhs_):
                                 matrix_container_t<T>(rhs_.n_rows, rhs_.n_cols)
                         {
                                 for (size_t i = 0; i < n_rows; i++)
                                         construct(rows[i], *rhs_.rows[i]);
                         }
+
+                        virtual ~matrix_t () = default;
 
                         matrix_t& operator=(matrix_t &rhs_)
                         {
@@ -125,9 +127,11 @@ namespace matrixes
                         imatrix_t<T>* power_zero () const override;
                         row_t<T> mul (row_t<T> &rhs_) const override;
 
+                        imatrix_t<T>* clone () const override 
+                        { return new matrix_t<T> {*this}; }
+
                         static matrix_t<T> gen_random (size_t n_rows, size_t n_cols);
                         row_t<T> power_iteration (int n_iters) const;
-
 
                         void dump () const;
         };
@@ -179,12 +183,10 @@ imatrix_t<T>* matrix_t<T>::power_zero () const
         template <typename T>
         row_t<T> matrix_t<T>::mul (row_t<T> &rhs_) const
         {
-                auto n_rows = get_n_rows();
                 if (n_rows != rhs_.get_size())
                         throw std::out_of_range("Wrong matrix and row dimensions.");
                         
                 std::vector<T> new_elems {};
-                auto n_cols = get_n_cols();
                 for (size_t i = 0; i < n_rows; i++) {
                         T temp {};
                         for (size_t j = 0; j < n_cols; j++)

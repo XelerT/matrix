@@ -8,7 +8,7 @@
 namespace matrixes
 {
         template <typename T>
-        class sq_matrix_t : public matrix_t<T>
+        class sq_matrix_t final : public matrix_t<T>
         {
                 private:
                         T determinant {};
