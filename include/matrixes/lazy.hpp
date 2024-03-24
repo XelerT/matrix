@@ -91,18 +91,18 @@ namespace matrixes
                                 return temp;
                         }
 
-                        std::vector<T> mul (std::shared_ptr<lazy_matrix_container_t<T>> &rhs_) const
+                        std::vector<T> mul (lazy_matrix_container_t<T> &rhs_) const
                         {
-                                if (n_cols != rhs_->get_n_rows())
+                                if (n_cols != rhs_.get_n_rows())
                                         throw std::out_of_range("Wrong matrixes dimensions.");
                                         
                                 std::vector<T> new_elems {};
                                 for (size_t i = 0; i < n_rows; i++) {
-                                        auto n_cols_ = rhs_->get_n_cols();
+                                        auto n_cols_ = rhs_.get_n_cols();
                                         for (size_t k = 0; k < n_cols_; k++) {
                                                 T temp {};
                                                 for (size_t j = 0; j < n_cols; j++) {
-                                                        temp += (*this)[i][j] * (*rhs_)[j][k];                                
+                                                        temp += (*this)[i][j] * rhs_[j][k];                                
                                                 }
                                                 new_elems.push_back(temp);
                                         }
@@ -240,7 +240,7 @@ void lazy_matrix_t<T>::swap (size_t index1, size_t index2)
 template <typename T>
 imatrix_t<T>* lazy_matrix_t<T>::mul (imatrix_t<T> &rhs_) const
 {
-        std::vector<T> new_elems = container->mul(static_cast<lazy_matrix_t<T>&>(rhs_).container);
+        std::vector<T> new_elems = container->mul(*static_cast<lazy_matrix_t<T>&>(rhs_).container);
 
         return new lazy_matrix_t {get_n_rows(), rhs_.get_n_cols(), new_elems.begin()};
 }
@@ -296,7 +296,7 @@ lazy_matrix_t<T>& lazy_matrix_t<T>::operator*= (lazy_matrix_t &rhs)
         auto n_cols = container->get_n_cols(); 
 
         if (container->get_linked_with() > 1) {
-                std::vector<T> new_elems = container->mul(rhs.container);
+                std::vector<T> new_elems = container->mul(*rhs.container);
                 auto prev_container = container;
                 container.reset(new lazy_matrix_container_t<T> {get_n_rows(), n_cols});
                         
