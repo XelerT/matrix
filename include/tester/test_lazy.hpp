@@ -25,14 +25,14 @@ class tester_t
                 void end_timer           () { time_tracker.end();    }
                 duration get_delta_time  () { return time_tracker.get_delta_time(); }
                 void dump (std::ostream &os, const std::string &msg = "")
-                { mem_tracker.dump(os, msg); time_tracker.dump(os, msg); os << std::endl; }
+                { mem_tracker.dump(os, msg); time_tracker.dump(os); os << std::endl; }
                 void dump_mem (std::ostream &os, const std::string &msg = "")
                 { mem_tracker.dump(os, msg); os << std::endl; }
                 void dump_time (std::ostream &os, const std::string &msg = "")
                 { time_tracker.dump(os, msg); os << std::endl; }
 
                 void reset_used_mem_cnt ()      { mem_tracker.reset_used_mem_cnt(); }
-                void* tracked_new (size_t size) { mem_tracker.tracked_new(size); }
+                void* tracked_new (size_t size) { return mem_tracker.tracked_new(size); }
                 void tracked_delete (void* ptr) { mem_tracker.tracked_delete(ptr); }
 };
 

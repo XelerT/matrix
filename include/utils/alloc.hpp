@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <utility>
 
+#include "utils.hpp"
+
 class mem_tracker_t 
 {
         private:
@@ -76,9 +78,9 @@ class mem_tracker_t
 
                 void dump (std::ostream &os, const std::string &msg = "")
                 {
-                        os << msg                                 << std::endl;
-                        os << "Allocated memory: " << mem_alloced << std::endl;
-                        os << "Used memory: "      << mem_used    << std::endl;
+                        os << CONSOLE_CLRS::GREEN << msg << std::endl << CONSOLE_CLRS::DEFAULT;
+                        os <<  "Allocated memory: " << mem_alloced << std::endl << CONSOLE_CLRS::DEFAULT;
+                        os << "Used memory: "      << mem_used;
                 }
 };
 

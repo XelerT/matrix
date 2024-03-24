@@ -108,14 +108,16 @@ void test_math_opers (std::ostream &os)
 
 void test_lazy_matrix (std::ostream &os)
 {
-        // os << CONSOLE_CLRS::BLUE << "\nTest: Math operations\n" << CONSOLE_CLRS::DEFAULT;
-        // test_math_opers(os);
+#ifdef TEST_ALL
+        os << CONSOLE_CLRS::BLUE << "\nTest: Math operations\n" << CONSOLE_CLRS::DEFAULT;
+        test_math_opers(os);
 
-        // os << CONSOLE_CLRS::BLUE << "\nTest: Power operations\n" << CONSOLE_CLRS::DEFAULT;
-        // test_power_iters(os);
+        os << CONSOLE_CLRS::BLUE << "\nTest: Power operations\n" << CONSOLE_CLRS::DEFAULT;
+        test_power_iters(os);
 
         os << CONSOLE_CLRS::BLUE << "\nTest: Recursive raise to power\n" << CONSOLE_CLRS::DEFAULT;
         test_rec_raise2power(os, 20, 10);
+#endif /*TEST_ALL*/
 
         os << CONSOLE_CLRS::BLUE << "\nTest: Raise to power\n" << CONSOLE_CLRS::DEFAULT;
         test_raise2power(os, 20, 10);

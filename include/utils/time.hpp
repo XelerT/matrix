@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+#include "utils.hpp"
+
 class time_tracker_t
 {
         public:
@@ -19,7 +21,7 @@ class time_tracker_t
                 duration get_delta_time () { return delta_time; }
                 void dump (std::ostream &os, const std::string &msg = "")
                 {
-                        os << msg << std::endl;
+                        os << CONSOLE_CLRS::GREEN << msg << std::endl << CONSOLE_CLRS::DEFAULT;
                         os << "Duration: " << delta_time.count() << "ms" << std::endl;
                 }
 };
